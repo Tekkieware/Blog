@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react"
 import { Badge } from "@/components/ui-tailwind/badge"
 import { Button } from "@/components/ui-tailwind/button"
-import { ArrowUpRight, Calendar, Pause, Play, Tag } from "lucide-react"
+import { ArrowRight, ArrowUpRight, Calendar, Pause, Play, Tag } from "lucide-react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui-tailwind/card"
@@ -100,7 +100,7 @@ export function FeaturedMarquee() {
   }, [])
 
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full space-y-16">
       <div className="relative w-full overflow-hidden">
         {/* Blinking cursor with reduced width to 1px */}
         <div
@@ -158,15 +158,34 @@ export function FeaturedMarquee() {
       </div>
 
       {/* Media-style play/pause button with "Enter the Stack" styling */}
-      <div className="flex justify-center">
+      <div className="flex flex-col justify-center sm:flex-row gap-4 mt-8">
         <Button
-          variant="outline"
-          size="icon"
-          className="h-12 w-12 rounded-full bg-primary/10 backdrop-blur-sm border border-primary/20 hover:bg-primary/20 text-primary"
-          onClick={togglePause}
-          aria-label={isPaused ? "Play" : "Pause"}
+          asChild
+          size="lg"
+          className="bg-primary/10 backdrop-blur-sm border border-primary/20 hover:bg-primary/20 text-primary group"
         >
-          {isPaused ? <Play className="h-5 w-5" /> : <Pause className="h-5 w-5" />}
+          <Link href="/posts" className="flex items-center">
+            All Posts
+            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </Link>
+        </Button>
+        <Button
+          size="lg"
+          variant="outline"
+          className="backdrop-blur-sm border-primary/20 hover:bg-primary/10 flex items-center"
+          onClick={togglePause}
+        >
+          {isPaused ? (
+            <>
+              <Play className="mr-2 h-4 w-4" />
+              Resume the Flow
+            </>
+          ) : (
+            <>
+              <Pause className="mr-2 h-4 w-4" />
+              Pause to Catch Something Cool
+            </>
+          )}
         </Button>
       </div>
     </div>

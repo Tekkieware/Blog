@@ -45,37 +45,6 @@ export default function Home() {
           <div className="w-full max-w-5xl">
             <FeaturedMarquee />
           </div>
-
-          <div className="flex flex-col sm:flex-row gap-4 mt-8">
-            <Button
-              asChild
-              size="lg"
-              className="bg-primary/10 backdrop-blur-sm border border-primary/20 hover:bg-primary/20 text-primary group"
-            >
-              <Link href="/posts" className="flex items-center">
-                All Posts
-                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </Link>
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="backdrop-blur-sm border-primary/20 hover:bg-primary/10 flex items-center"
-              onClick={toggleMarquee}
-            >
-              {isPaused ? (
-                <>
-                  <Play className="mr-2 h-4 w-4" />
-                  Resume the Flow
-                </>
-              ) : (
-                <>
-                  <Pause className="mr-2 h-4 w-4" />
-                  Pause to Catch Something Cool
-                </>
-              )}
-            </Button>
-          </div>
         </div>
       </section>
 
