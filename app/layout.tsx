@@ -21,7 +21,7 @@ const fontMono = FontMono({
 export const metadata: Metadata = {
   title: "Stacked: The Mind of a Senior Engineer",
   description: "Build systems. Grow people. Leave logs.",
-    generator: 'v0.dev'
+  generator: 'my blog'
 }
 
 export default function RootLayout({
