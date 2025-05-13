@@ -16,6 +16,7 @@ const fontSans = FontSans({
 const fontMono = FontMono({
   subsets: ["latin"],
   variable: "--font-mono",
+  weight: ["400", "500", "700"]
 })
 
 export const metadata: Metadata = {
