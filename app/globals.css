@@ -74,6 +74,7 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground transition-colors duration-300;
   }
@@ -129,6 +130,7 @@
   0% {
     transform: rotateX(60deg) translateZ(-100px) translateY(0);
   }
+
   100% {
     transform: rotateX(60deg) translateZ(-100px) translateY(50px);
   }
@@ -183,6 +185,7 @@
   0% {
     transform: translateX(0);
   }
+
   100% {
     transform: translateX(-50%);
   }
@@ -199,10 +202,12 @@
 
 /* Cursor blink animation */
 @keyframes cursor-blink {
+
   0%,
   100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0;
   }

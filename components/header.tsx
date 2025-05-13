@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation"
 import { ModeToggle } from "@/components/mode-toggle"
 import { CommandIcon, Terminal } from "lucide-react"
 import { Button } from "@/components/ui-tailwind/button"
+import Logo from "./logo"
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false)
@@ -30,13 +31,8 @@ export default function Header() {
       )}
     >
       <div className="container flex h-16 items-center justify-between">
-        <Link href="/" className="flex items-center group">
-          <div className="bg-primary/10 p-1.5 rounded-md mr-2 border border-primary/20 group-hover:bg-primary/20 transition-colors">
-            <Terminal className="h-4 w-4 text-primary" />
-          </div>
-          <span className="font-mono text-xl font-bold">
-            <span className="text-primary">stacked</span>
-          </span>
+        <Link href="/" className="flex items-center text-xl font-bold tracking-wider">
+          <Logo />
         </Link>
 
         <div className="flex items-center gap-1 md:gap-4">
@@ -49,7 +45,7 @@ export default function Header() {
                 pathname === "/posts" && "text-foreground font-medium",
               )}
             >
-              <Link href="/posts">Blog</Link>
+              <Link href="/posts" className=" text-sm">Blog</Link>
             </Button>
           </nav>
 
@@ -62,7 +58,7 @@ export default function Header() {
             <CommandIcon className="h-4 w-4 text-primary" />
           </Button>
           <ModeToggle />
-          <Button variant="default" className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
+          <Button variant="default" className="rounded-md bg-primary text-sm text-primary-foreground hover:bg-primary/90">
             Subscribe
           </Button>
         </div>
