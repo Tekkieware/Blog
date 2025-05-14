@@ -71,7 +71,7 @@ export default function AboutPage() {
               <div className="flex flex-wrap gap-2">
                 <Badge variant="outline" className="border-cyan-400/30 text-cyan-400">
                   <Terminal className="h-3 w-3 mr-1" />
-                  12+ Years Experience
+                  3+ Years Experience
                 </Badge>
                 <Badge variant="outline" className="border-indigo-400/30 text-indigo-400">
                   <Code className="h-3 w-3 mr-1" />

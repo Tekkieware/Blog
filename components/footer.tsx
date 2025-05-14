@@ -11,14 +11,14 @@ export default function Footer() {
           </p>
         </div>
         <div className="flex items-center gap-4 font-mono text-sm">
-          <a href="https://github.com" className="text-muted-foreground hover:text-foreground transition-colors">
-            &gt; open github://senior.dev
+          <a href="https://github.com/Tekkieware" className="text-muted-foreground hover:text-foreground transition-colors">
+            &gt; open github://io
           </a>
-          <a href="https://twitter.com" className="text-muted-foreground hover:text-foreground transition-colors">
-            &gt; open x://senior.dev
+          <a href="https://isaiahozadhe.tech" className="text-muted-foreground hover:text-foreground transition-colors">
+            &gt; open portfolio://io
           </a>
-          <a href="https://linkedin.com" className="text-muted-foreground hover:text-foreground transition-colors">
-            &gt; open linkedin://senior.dev
+          <a href="https://www.linkedin.com/in/isaiah-ozadhe/" className="text-muted-foreground hover:text-foreground transition-colors">
+            &gt; open linkedin://io
           </a>
         </div>
       </div>
