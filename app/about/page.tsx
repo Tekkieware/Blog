@@ -7,14 +7,14 @@ import Link from "next/link"
 
 export default function AboutPage() {
   return (
-    <div className="container py-12">
-      <div className="max-w-4xl mx-auto">
+    <div className="container py-8">
+      <div className="mx-auto">
         {/* Page Header */}
         <div className="mb-12 text-center">
           <h1 className="font-mono text-4xl font-bold mb-4">About the Author</h1>
           <div className="flex items-center justify-center">
             <div className="h-px w-16 bg-primary/50"></div>
-            <span className="px-4 text-muted-foreground">The mind behind the stack</span>
+            <span className="px-4 text-muted-foreground">The brain behind it all</span>
             <div className="h-px w-16 bg-primary/50"></div>
           </div>
         </div>
