@@ -33,11 +33,11 @@ export default function Home() {
           <div className="space-y-6">
             {/* Removed terminal-text class to remove the blinking cursor */}
             <h1 className="font-mono text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight">
-              SYSTEM BOOT &gt;&gt; LOADING SENIOR ENGINEER MINDSTACK...
+              ISAIAH OZADHE &gt;&gt; A PEEK INTO A SOFTWARE ENGINEER'S MIND...
             </h1>
 
-            <p className="max-w-[700px] text-muted-foreground md:text-xl">
-              A collection of thoughts, patterns, and insights from the mind of a senior engineer.
+            <p className="text-muted-foreground md:text-xl">
+              A collection of thoughts, patterns, and insights.
             </p>
           </div>
 
@@ -53,7 +53,7 @@ export default function Home() {
         <div className="container">
           <div className="flex items-center mb-8">
             <div className="h-px flex-1 bg-border"></div>
-            <h2 className="text-3xl font-bold font-mono px-4">Mind Layers</h2>
+            <h2 className="text-3xl font-bold font-mono px-4">Categories</h2>
             <div className="h-px flex-1 bg-border"></div>
           </div>
           <LayerNavigator />

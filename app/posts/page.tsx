@@ -20,11 +20,6 @@ export default function PostsPage() {
   return (
     <div className="container py-8">
       <div className="flex flex-col space-y-6">
-        <div className="flex flex-col space-y-2">
-          <h1 className="text-3xl font-bold font-mono">Mind Stack</h1>
-          <p className="text-muted-foreground">Browse through the layers of a senior engineer&apos;s mind</p>
-        </div>
-
         <PostFilters activeLayer={activeLayer} setActiveLayer={setActiveLayer} />
 
         <PostGrid activeLayer={activeLayer} />
