@@ -28,7 +28,7 @@ export default function AboutPage() {
                 <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary to-secondary blur-md opacity-20"></div>
                 <div className="relative h-48 w-48 rounded-full border-2 border-primary/30 overflow-hidden">
                   <img
-                    src="/placeholder.svg?height=200&width=200"
+                    src="/photo.jpg?height=200&width=200"
                     alt="Author"
                     className="h-full w-full object-cover"
                   />
