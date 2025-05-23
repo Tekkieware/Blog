@@ -5,7 +5,7 @@ import { useEffect, useState } from "react"
 import { cn } from "@/lib/utils"
 import { usePathname } from "next/navigation"
 import { ModeToggle } from "@/components/mode-toggle"
-import { CommandIcon, Terminal } from "lucide-react"
+import { CommandIcon, Pen, Terminal } from "lucide-react"
 import { Button } from "@/components/ui-tailwind/button"
 import Logo from "./logo"
 
@@ -33,6 +33,7 @@ export default function Header() {
       <div className="container flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center text-xl font-bold tracking-wider">
           <Logo />
+          <Pen className=" -mb-2 text-primary" />
         </Link>
 
         <div className="flex items-center gap-1 md:gap-4">
