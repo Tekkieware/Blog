@@ -7,30 +7,31 @@ import { MessageSquare, Calendar, Tag, ArrowLeft, Clock, User } from "lucide-rea
 import Link from "next/link";
 import { TableOfContents } from "@/components/table-of-content";
 import { MarkdownRenderer } from "@/components/markdown-renderer";
+import StickyBackButton from "@/components/sticky-back-button";
 
 const generateSlug = (text: string): string => {
-    return text
-        .toLowerCase()
-        .replace(/[^\w\s-]/g, '') // Remove special characters
-        .replace(/\s+/g, '-') // Replace spaces with hyphens
-        .trim();
+  return text
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '') // Remove special characters
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .trim();
 };
 
 const generateToc = (markdown: string) => {
-    const lines = markdown.split('\n');
-    const toc: { id: string, title: string, level: number }[] = [];
+  const lines = markdown.split('\n');
+  const toc: { id: string, title: string, level: number }[] = [];
 
-    lines.forEach(line => {
-        const match = line.match(/^(#+)\s+(.*)/);
-        if (match) {
-            const level = match[1].length;
-            const title = match[2];
-            const id = generateSlug(title);
-            toc.push({ id, title, level });
-        }
-    });
+  lines.forEach(line => {
+    const match = line.match(/^(#+)\s+(.*)/);
+    if (match) {
+      const level = match[1].length;
+      const title = match[2];
+      const id = generateSlug(title);
+      toc.push({ id, title, level });
+    }
+  });
 
-    return toc;
+  return toc;
 };
 
 const heroImage = "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80";
@@ -476,12 +477,12 @@ Remember: the goal isn't to create the most generic components possible, but to 
 > 🚀 **Next Steps**: Try refactoring one of your existing components using these composition patterns. Start with the compound component pattern - it's often the most impactful!
 `,
   debug_notes: [
-        "Consider using React Context for deeply nested components",
-        "Avoid prop drilling more than 2 levels deep",
-        "Remember to memoize expensive calculations",
-        "Use TypeScript for better component interfaces",
-        "Test component composition boundaries",
-    ],
+    "Consider using React Context for deeply nested components",
+    "Avoid prop drilling more than 2 levels deep",
+    "Remember to memoize expensive calculations",
+    "Use TypeScript for better component interfaces",
+    "Test component composition boundaries",
+  ],
 };
 
 export default function PostDetail() {
@@ -490,20 +491,12 @@ export default function PostDetail() {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <div className="container py-6">
-        <Link
-          href="/"
-          className="inline-flex items-center text-sm text-primary hover:text-primary/80 transition-colors"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
-        </Link>
-      </div>
+      <StickyBackButton link="posts" />
 
       <div className="container pb-16">
         <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr_280px] gap-8">
           {/* Table of Contents - Desktop Only */}
-          <aside className="hidden lg:block sticky top-20 self-start h-fit">
+          <aside className="hidden lg:block sticky top-30 self-start h-fit">
             <TableOfContents items={tableOfContents} />
           </aside>
 
