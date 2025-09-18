@@ -7,6 +7,7 @@ import { MessageSquare, Calendar, Tag, ArrowLeft, Clock, User } from "lucide-rea
 import Link from "next/link";
 import { TableOfContents } from "@/components/table-of-content";
 import { MarkdownRenderer } from "@/components/markdown-renderer";
+import { generateToc } from "@/lib/toc";
 
 const heroImage = "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80";
 const componentArchImage = "https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80";
@@ -450,24 +451,11 @@ Remember: the goal isn't to create the most generic components possible, but to 
 
 > 🚀 **Next Steps**: Try refactoring one of your existing components using these composition patterns. Start with the compound component pattern - it's often the most impactful!
 `,
-  tableOfContents: [
-    { id: "introduction", title: "Introduction", level: 1 },
-    { id: "why-composition-matters", title: "Why Composition Matters", level: 2 },
-    { id: "the-problem-with-monolithic-components", title: "The Problem with Monolithic Components", level: 3 },
-    { id: "the-composition-solution", title: "The Composition Solution", level: 3 },
-    { id: "advanced-patterns", title: "Advanced Patterns", level: 2 },
-    { id: "compound-components", title: "Compound Components", level: 3 },
-    { id: "render-props-pattern", title: "Render Props Pattern", level: 3 },
-    { id: "custom-hooks-for-logic-composition", title: "Custom Hooks for Logic Composition", level: 3 },
-    { id: "best-practices", title: "Best Practices", level: 2 },
-    { id: "1-start-small-compose-up", title: "1. Start Small, Compose Up", level: 3 },
-    { id: "2-use-typescript-for-better-composition", title: "2. Use TypeScript for Better Composition", level: 3 },
-    { id: "3-document-your-composition-apis", title: "3. Document Your Composition APIs", level: 3 },
-    { id: "conclusion", title: "Conclusion", level: 2 },
-  ],
 };
 
 export default function PostDetail() {
+  const tableOfContents = generateToc(post.content);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
@@ -485,7 +473,7 @@ export default function PostDetail() {
         <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr_280px] gap-8">
           {/* Table of Contents - Desktop Only */}
           <aside className="hidden lg:block sticky top-20 self-start h-fit">
-            <TableOfContents items={post.tableOfContents} />
+            <TableOfContents items={tableOfContents} />
           </aside>
 
           {/* Main Content */}
@@ -537,7 +525,7 @@ export default function PostDetail() {
 
             {/* Table of Contents - Mobile Only */}
             <div className="lg:hidden mb-8">
-              <TableOfContents items={post.tableOfContents} />
+              <TableOfContents items={tableOfContents} />
             </div>
 
             {/* Content */}
