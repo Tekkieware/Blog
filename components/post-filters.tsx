@@ -11,10 +11,11 @@ import { layers } from "@/components/layer-navigator"
 interface PostFiltersProps {
   activeLayer: string
   setActiveLayer: (layer: string) => void
+  viewMode: "grid" | "list"
+  setViewMode: (mode: "grid" | "list") => void
 }
 
-export function PostFilters({ activeLayer, setActiveLayer }: PostFiltersProps) {
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
+export function PostFilters({ activeLayer, setActiveLayer, viewMode, setViewMode }: PostFiltersProps) {
   const router = useRouter()
   const pathname = usePathname()
 

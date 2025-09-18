@@ -86,73 +86,77 @@ const getLayerColor = (layer: string) => {
   }
 }
 
-interface PostGridProps {
+interface PostListProps {
   activeLayer: string
 }
 
-export function PostGrid({ activeLayer }: PostGridProps) {
+export function PostList({ activeLayer }: PostListProps) {
   // Filter posts based on active layer
   const filteredPosts = activeLayer === "all" ? posts : posts.filter((post) => post.layer === activeLayer)
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="space-y-6">
       {filteredPosts.length > 0 ? (
         filteredPosts.map((post) => (
           <Link href={`/posts/${post.slug}`} key={post.id}>
             <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
               <Card
                 className={cn(
-                  "h-full overflow-hidden transition-all duration-200 group border-2",
+                  "overflow-hidden transition-all duration-200 group border-2 mb-5",
                   `border-${getLayerColor(post.layer)}-400/30 hover:border-${getLayerColor(post.layer)}-400/50`,
                   "hover:shadow-lg dark:hover:shadow-[0_0_15px_rgba(0,240,255,0.15)]",
                 )}
               >
-                <CardHeader className="pb-2">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Badge
-                      variant="outline"
-                      className={cn(
-                        "text-xs border",
-                        `border-${getLayerColor(post.layer)}-400/30 text-${getLayerColor(post.layer)}-400`,
-                      )}
+                <div className="flex flex-col sm:flex-row">
+                  <div className="flex-1">
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            "text-xs border",
+                            `border-${getLayerColor(post.layer)}-400/30 text-${getLayerColor(post.layer)}-400`,
+                          )}
+                        >
+                          {post.layer}
+                        </Badge>
+                        <div className="flex items-center text-xs text-muted-foreground">
+                          <Calendar className="h-3 w-3 mr-1" />
+                          {post.date}
+                        </div>
+                      </div>
+                      <CardTitle className="font-mono text-xl group-hover:text-primary transition-colors">
+                        {post.title}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-muted-foreground">{post.excerpt}</p>
+                      <div className="flex flex-wrap gap-2 mt-4">
+                        {post.tags.map((tag) => (
+                          <Badge key={tag} variant="secondary" className="text-xs">
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </div>
+                  <div className="flex-shrink-0 flex items-center justify-end p-6">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="text-primary hover:text-primary hover:bg-primary/10 -ml-2 group"
                     >
-                      {post.layer}
-                    </Badge>
-                    <div className="flex items-center text-xs text-muted-foreground">
-                      <Calendar className="h-3 w-3 mr-1" />
-                      {post.date}
-                    </div>
+                      <span>Read more</span>
+                      <ArrowUpRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+                    </Button>
                   </div>
-                  <CardTitle className="font-mono text-xl group-hover:text-primary transition-colors">
-                    {post.title}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">{post.excerpt}</p>
-                  <div className="flex flex-wrap gap-2 mt-4">
-                    {post.tags.map((tag) => (
-                      <Badge key={tag} variant="secondary" className="text-xs">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                </CardContent>
-                <CardFooter className="pt-0">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="text-primary hover:text-primary hover:bg-primary/10 -ml-2 group"
-                  >
-                    <span>Read more</span>
-                    <ArrowUpRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
-                  </Button>
-                </CardFooter>
+                </div>
               </Card>
             </motion.div>
           </Link>
         ))
       ) : (
-        <div className="col-span-3 text-center py-12">
+        <div className="text-center py-12">
           <p className="text-muted-foreground">No posts found in this layer.</p>
         </div>
       )}
