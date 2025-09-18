@@ -24,6 +24,10 @@ export default function EditPostPage({ params }: { params: { id: string } }) {
     layer: "",
     tags: "",
     slug: "",
+    date: "",
+    author: "",
+    readTime: "",
+    debug_notes: "",
   })
 
   useEffect(() => {
@@ -71,6 +75,10 @@ This editor supports full markdown syntax and provides a great writing experienc
         layer: post.layer,
         tags: post.tags.join(", "),
         slug: post.slug,
+        date: post.date,
+        author: post.author,
+        readTime: post.readTime,
+        debug_notes: post.debug_notes.join("\n"),
       })
     } else {
       // Post not found, redirect to admin
@@ -90,6 +98,13 @@ This editor supports full markdown syntax and provides a great writing experienc
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+
+    const post = {
+      ...formData,
+      debug_notes: formData.debug_notes.split("\n"),
+    }
+
+    console.log(post)
 
     // In a real app, this would send data to an API
     setTimeout(() => {
@@ -210,6 +225,48 @@ This editor supports full markdown syntax and provides a great writing experienc
                       className="block w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
                     />
                   </div>
+                  <div className="space-y-2">
+                    <label htmlFor="date" className="block text-sm font-medium">
+                      Date
+                    </label>
+                    <input
+                      id="date"
+                      name="date"
+                      type="date"
+                      required
+                      value={formData.date}
+                      onChange={handleChange}
+                      className="block w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="author" className="block text-sm font-medium">
+                      Author
+                    </label>
+                    <input
+                      id="author"
+                      name="author"
+                      type="text"
+                      required
+                      value={formData.author}
+                      onChange={handleChange}
+                      className="block w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="readTime" className="block text-sm font-medium">
+                      Read Time
+                    </label>
+                    <input
+                      id="readTime"
+                      name="readTime"
+                      type="text"
+                      required
+                      value={formData.readTime}
+                      onChange={handleChange}
+                      className="block w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-2">
@@ -282,6 +339,20 @@ This editor supports full markdown syntax and provides a great writing experienc
                       className="min-h-[400px]"
                     />
                   )}
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="debug_notes" className="block text-sm font-medium">
+                    Debug Notes (one per line)
+                  </label>
+                  <textarea
+                    id="debug_notes"
+                    name="debug_notes"
+                    rows={4}
+                    value={formData.debug_notes}
+                    onChange={handleChange}
+                    className="block w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
+                  />
                 </div>
               </form>
             </CardContent>

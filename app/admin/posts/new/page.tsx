@@ -22,6 +22,10 @@ export default function NewPostPage() {
     layer: "frontend",
     tags: "",
     slug: "",
+    date: "",
+    author: "",
+    readTime: "",
+    debug_notes: "",
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -46,6 +50,13 @@ export default function NewPostPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+
+    const post = {
+      ...formData,
+      debug_notes: formData.debug_notes.split("\n"),
+    }
+
+    console.log(post)
 
     // In a real app, this would send data to an API
     setTimeout(() => {
@@ -149,6 +160,48 @@ export default function NewPostPage() {
                       className="block w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
                     />
                   </div>
+                  <div className="space-y-2">
+                    <label htmlFor="date" className="block text-sm font-medium">
+                      Date
+                    </label>
+                    <input
+                      id="date"
+                      name="date"
+                      type="date"
+                      required
+                      value={formData.date}
+                      onChange={handleChange}
+                      className="block w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="author" className="block text-sm font-medium">
+                      Author
+                    </label>
+                    <input
+                      id="author"
+                      name="author"
+                      type="text"
+                      required
+                      value={formData.author}
+                      onChange={handleChange}
+                      className="block w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="readTime" className="block text-sm font-medium">
+                      Read Time
+                    </label>
+                    <input
+                      id="readTime"
+                      name="readTime"
+                      type="text"
+                      required
+                      value={formData.readTime}
+                      onChange={handleChange}
+                      className="block w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-2">
@@ -222,6 +275,20 @@ export default function NewPostPage() {
                       className="min-h-[400px]"
                     />
                   )}
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="debug_notes" className="block text-sm font-medium">
+                    Debug Notes (one per line)
+                  </label>
+                  <textarea
+                    id="debug_notes"
+                    name="debug_notes"
+                    rows={4}
+                    value={formData.debug_notes}
+                    onChange={handleChange}
+                    className="block w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
+                  />
                 </div>
               </form>
             </CardContent>

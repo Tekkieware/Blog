@@ -8,6 +8,9 @@ export const posts = [
         layer: "frontend",
         tags: ["react", "architecture", "patterns"],
         slug: "component-composition",
+        author: "John Doe",
+        readTime: "5 min read",
+        debug_notes: [],
     },
     {
         id: "2",
@@ -17,6 +20,9 @@ export const posts = [
         layer: "backend",
         tags: ["api", "rest", "graphql"],
         slug: "api-design-principles",
+        author: "Jane Smith",
+        readTime: "8 min read",
+        debug_notes: [],
     },
     {
         id: "3",
@@ -26,6 +32,9 @@ export const posts = [
         layer: "devops",
         tags: ["terraform", "aws", "iac"],
         slug: "infrastructure-as-code",
+        author: "Peter Jones",
+        readTime: "12 min read",
+        debug_notes: [],
     },
     {
         id: "4",
@@ -35,6 +44,9 @@ export const posts = [
         layer: "architecture",
         tags: ["scaling", "distributed-systems", "performance"],
         slug: "scaling-to-million-users",
+        author: "Mary Johnson",
+        readTime: "15 min read",
+        debug_notes: [],
     },
     {
         id: "5",
@@ -44,6 +56,9 @@ export const posts = [
         layer: "peopleware",
         tags: ["leadership", "culture", "mentorship"],
         slug: "building-engineering-teams",
+        author: "David Williams",
+        readTime: "10 min read",
+        debug_notes: [],
     },
     {
         id: "6",
@@ -53,5 +68,8 @@ export const posts = [
         layer: "overflow",
         tags: ["debugging", "incidents", "lessons"],
         slug: "late-night-debugging",
+        author: "Susan Brown",
+        readTime: "7 min read",
+        debug_notes: [],
     },
 ]
