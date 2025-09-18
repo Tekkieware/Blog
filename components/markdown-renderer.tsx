@@ -53,7 +53,7 @@ const CodeBlock = ({ inline, className, children, ...props }: CodeBlockProps) =>
                     variant="ghost"
                     size="sm"
                     onClick={handleCopy}
-                    className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-code-foreground/10"
+                    className="h-6 w-6 p-0 transition-opacity hover:bg-code-foreground/10"
                 >
                     {copied ? (
                         <Check className="h-3 w-3 text-green-400" />
