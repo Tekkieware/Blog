@@ -20,8 +20,8 @@ const fontMono = FontMono({
 })
 
 export const metadata: Metadata = {
-  title: "Stacked: The Mind of a Senior Engineer",
-  description: "Build systems. Grow people. Leave logs.",
+  title: "Isaiah Ozadhe: A Peak Into the Mind of a Software Engineer",
+  description: "Build solutions. Share thoughts.",
   generator: 'my blog'
 }
 
