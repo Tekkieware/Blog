@@ -44,7 +44,7 @@ const CodeBlock = ({ inline, className, children, ...props }: CodeBlockProps) =>
     }
 
     return (
-        <div className="relative group my-6">
+        <div className="relative group rounded-lg">
             <div className="flex items-center justify-between bg-code-background border border-code-border rounded-t-lg px-4 py-2">
                 <span className="text-xs font-mono text-code-foreground/70 uppercase tracking-wide">
                     {language || 'code'}
@@ -53,7 +53,7 @@ const CodeBlock = ({ inline, className, children, ...props }: CodeBlockProps) =>
                     variant="ghost"
                     size="sm"
                     onClick={handleCopy}
-                    className="h-6 w-6 p-0 transition-opacity hover:bg-code-foreground/10"
+                    className="h-6 w-6 p-0 transition-opacity"
                 >
                     {copied ? (
                         <Check className="h-3 w-3 text-green-400" />

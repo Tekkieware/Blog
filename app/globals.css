@@ -179,6 +179,10 @@
   letter-spacing: 2px;
 }
 
+pre {
+  padding: 0;
+}
+
 /* Marquee animation */
 @keyframes marquee {
   0% {
