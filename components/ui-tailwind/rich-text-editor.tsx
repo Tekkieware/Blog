@@ -15,6 +15,9 @@ import {
     Heading1,
     Heading2,
     Heading3,
+    Heading4,
+    Heading5,
+    Heading6,
 } from "lucide-react"
 import { Button } from "./button"
 
@@ -211,6 +214,9 @@ export const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>
             { icon: Heading1, action: () => insertHeading(1), title: "Heading 1" },
             { icon: Heading2, action: () => insertHeading(2), title: "Heading 2" },
             { icon: Heading3, action: () => insertHeading(3), title: "Heading 3" },
+            { icon: Heading4, action: () => insertHeading(4), title: "Heading 4" },
+            { icon: Heading5, action: () => insertHeading(5), title: "Heading 5" },
+            { icon: Heading6, action: () => insertHeading(6), title: "Heading 6" },
             { icon: List, action: () => insertList(false), title: "Bullet List" },
             { icon: ListOrdered, action: () => insertList(true), title: "Numbered List" },
             { icon: Quote, action: insertBlockquote, title: "Blockquote" },
