@@ -129,6 +129,30 @@ export const MarkdownRenderer = ({ content, className }: MarkdownRendererProps) 
                             </h3>
                         );
                     },
+                    h4: ({ children, ...props }) => {
+                        const id = generateSlug(String(children));
+                        return (
+                            <h4 id={id} className="scroll-mt-20 text-prose-headings font-semibold" {...props}>
+                                {children}
+                            </h4>
+                        );
+                    },
+                    h5: ({ children, ...props }) => {
+                        const id = generateSlug(String(children));
+                        return (
+                            <h5 id={id} className="scroll-mt-20 text-prose-headings font-semibold" {...props}>
+                                {children}
+                            </h5>
+                        );
+                    },
+                    h6: ({ children, ...props }) => {
+                        const id = generateSlug(String(children));
+                        return (
+                            <h6 id={id} className="scroll-mt-20 text-prose-headings font-semibold" {...props}>
+                                {children}
+                            </h6>
+                        );
+                    },
                     a: ({ children, href, ...props }) => (
                         <a
                             href={href}

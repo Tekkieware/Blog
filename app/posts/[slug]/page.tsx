@@ -7,7 +7,31 @@ import { MessageSquare, Calendar, Tag, ArrowLeft, Clock, User } from "lucide-rea
 import Link from "next/link";
 import { TableOfContents } from "@/components/table-of-content";
 import { MarkdownRenderer } from "@/components/markdown-renderer";
-import { generateToc } from "@/lib/toc";
+
+const generateSlug = (text: string): string => {
+    return text
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, '') // Remove special characters
+        .replace(/\s+/g, '-') // Replace spaces with hyphens
+        .trim();
+};
+
+const generateToc = (markdown: string) => {
+    const lines = markdown.split('\n');
+    const toc: { id: string, title: string, level: number }[] = [];
+
+    lines.forEach(line => {
+        const match = line.match(/^(#+)\s+(.*)/);
+        if (match) {
+            const level = match[1].length;
+            const title = match[2];
+            const id = generateSlug(title);
+            toc.push({ id, title, level });
+        }
+    });
+
+    return toc;
+};
 
 const heroImage = "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80";
 const componentArchImage = "https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80";
