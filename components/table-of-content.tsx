@@ -57,11 +57,15 @@ export const TableOfContents = ({ items, className }: TableOfContentsProps) => {
                                 className={cn(
                                     "text-left w-full flex items-center transition-colors hover:text-toc-active group",
                                     activeId === item.id
-                                        ? "text-toc-active font-medium"
+                                        ? "text-toc-active font-bold"
                                         : "text-toc-inactive"
                                 )}
                             >
-                                <span className="mr-2 text-xs opacity-50 group-hover:opacity-70">
+                                <span
+                                    className={cn(
+                                        "mr-2 text-xs opacity-50 group-hover:opacity-70",
+                                        activeId === item.id && "text-primary"
+                                    )}>
                                     {"#".repeat(item.level)}
                                 </span>
                                 <span className="truncate">{item.title}</span>
