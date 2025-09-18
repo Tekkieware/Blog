@@ -51,7 +51,7 @@ export const TableOfContents = ({ items, className }: TableOfContentsProps) => {
                 <h4 className="font-mono font-bold text-foreground mb-4">Table of Contents</h4>
                 <ul className="space-y-2 text-sm">
                     {items.map((item) => (
-                        <li key={item.id} style={{ paddingLeft: `${(item.level - 1) * 12}px` }}>
+                        <li key={item.id} style={{ paddingLeft: `${(item.level - 1) * 12}px` }} className='hover:font-bold'>
                             <button
                                 onClick={() => handleClick(item.id)}
                                 className={cn(

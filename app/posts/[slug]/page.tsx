@@ -475,6 +475,13 @@ Remember: the goal isn't to create the most generic components possible, but to 
 
 > 🚀 **Next Steps**: Try refactoring one of your existing components using these composition patterns. Start with the compound component pattern - it's often the most impactful!
 `,
+  debug_notes: [
+        "Consider using React Context for deeply nested components",
+        "Avoid prop drilling more than 2 levels deep",
+        "Remember to memoize expensive calculations",
+        "Use TypeScript for better component interfaces",
+        "Test component composition boundaries",
+    ],
 };
 
 export default function PostDetail() {
@@ -564,36 +571,12 @@ export default function PostDetail() {
                     Debug Notes
                   </h4>
                   <ul className="space-y-3 text-sm">
-                    <li className="flex items-start">
-                      <span className="text-primary mr-3 mt-1">•</span>
-                      <span className="text-muted-foreground">
-                        Consider using React Context for deeply nested components
-                      </span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-primary mr-3 mt-1">•</span>
-                      <span className="text-muted-foreground">
-                        Avoid prop drilling more than 2 levels deep
-                      </span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-primary mr-3 mt-1">•</span>
-                      <span className="text-muted-foreground">
-                        Remember to memoize expensive calculations
-                      </span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-primary mr-3 mt-1">•</span>
-                      <span className="text-muted-foreground">
-                        Use TypeScript for better component interfaces
-                      </span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-primary mr-3 mt-1">•</span>
-                      <span className="text-muted-foreground">
-                        Test component composition boundaries
-                      </span>
-                    </li>
+                    {post.debug_notes.map((note, index) => (
+                      <li key={index} className="flex items-start">
+                        <span className="text-primary mr-3 mt-1">•</span>
+                        <span className="text-muted-foreground">{note}</span>
+                      </li>
+                    ))}
                   </ul>
                 </div>
               </Card>
@@ -634,36 +617,12 @@ export default function PostDetail() {
                   Debug Notes
                 </h4>
                 <ul className="space-y-3 text-sm">
-                  <li className="flex items-start">
-                    <span className="text-primary mr-3 mt-1">•</span>
-                    <span className="text-muted-foreground">
-                      Consider using React Context for deeply nested components
-                    </span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-primary mr-3 mt-1">•</span>
-                    <span className="text-muted-foreground">
-                      Avoid prop drilling more than 2 levels deep
-                    </span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-primary mr-3 mt-1">•</span>
-                    <span className="text-muted-foreground">
-                      Remember to memoize expensive calculations
-                    </span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-primary mr-3 mt-1">•</span>
-                    <span className="text-muted-foreground">
-                      Use TypeScript for better component interfaces
-                    </span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-primary mr-3 mt-1">•</span>
-                    <span className="text-muted-foreground">
-                      Test component composition boundaries
-                    </span>
-                  </li>
+                  {post.debug_notes.map((note, index) => (
+                    <li key={index} className="flex items-start">
+                      <span className="text-primary mr-3 mt-1">•</span>
+                      <span className="text-muted-foreground">{note}</span>
+                    </li>
+                  ))}
                 </ul>
               </div>
             </Card>
