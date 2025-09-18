@@ -474,10 +474,10 @@ export default function PostDetail() {
       <div className="container py-6">
         <Link
           href="/"
-          className="inline-flex items-center text-primary hover:text-primary/80 transition-colors"
+          className="inline-flex items-center text-sm text-primary hover:text-primary/80 transition-colors"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to all posts
+          Back
         </Link>
       </div>
 
