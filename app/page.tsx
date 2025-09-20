@@ -53,7 +53,7 @@ export default function Home() {
         <div className="container">
           <div className="flex items-center mb-8">
             <div className="h-px flex-1 bg-border"></div>
-            <h2 className="text-3xl font-bold font-mono px-4">Categories</h2>
+            <h2 className="text-3xl font-bold font-mono px-4">Layers</h2>
             <div className="h-px flex-1 bg-border"></div>
           </div>
           <LayerNavigator />
