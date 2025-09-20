@@ -59,7 +59,7 @@ export default function Header() {
             <CommandIcon className="h-4 w-4 text-primary" />
           </Button>
           <ModeToggle />
-          <Button variant="default" className="rounded-md bg-primary text-sm text-primary-foreground hover:bg-primary/90">
+          <Button variant="default" className="rounded-md hidden sm:block bg-primary text-sm text-primary-foreground hover:bg-primary/90">
             Subscribe
           </Button>
         </div>

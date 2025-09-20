@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
-import { FileCode2, Layers, Moon, Sun, Tag, Terminal, User } from "lucide-react"
+import { FileCode2, Layers, Mail, Moon, Sun, Tag, Terminal, User } from "lucide-react"
 import {
   CommandDialog,
   CommandEmpty,
@@ -35,7 +35,6 @@ export default function CommandPalette() {
     <CommandDialog open={open} onOpenChange={setOpen}>
       <CommandInput placeholder="Type a command or search..." />
       <CommandList>
-        <CommandEmpty>No results found.</CommandEmpty>
         <CommandGroup heading="Navigation">
           <CommandItem
             onSelect={() => {
@@ -162,6 +161,19 @@ export default function CommandPalette() {
             <Tag className="mr-2 h-4 w-4" />
             <span>Architecture</span>
           </CommandItem>
+
+          <CommandSeparator />
+          <CommandGroup heading="Actions">
+            <CommandItem
+              onSelect={() => {
+                router.push("/subscribe") // 👈 internal page
+                setOpen(false)
+              }}
+            >
+              <Mail className="mr-2 h-4 w-4" />
+              <span>Subscribe to Newsletter</span>
+            </CommandItem>
+          </CommandGroup>
         </CommandGroup>
       </CommandList>
     </CommandDialog>
