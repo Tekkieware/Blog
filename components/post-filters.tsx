@@ -49,7 +49,7 @@ export function PostFilters({
             className="w-full md:w-xl pl-8 bg-background"
           />
         </div>
-        <div className="flex items-center border rounded-md">
+        <div className="items-center border rounded-md hidden md:flex">
           <Button
             variant={viewMode === "grid" ? "default" : "ghost"}
             size="icon"
