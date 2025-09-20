@@ -10,7 +10,7 @@ export default function Footer() {
             &quot;Build solutions. Share thoughts.&quot;
           </p>
         </div>
-        <div className="flex items-center gap-4 font-mono text-sm">
+        <div className="flex flex-col md:flex-row items-center gap-4 font-mono text-sm">
           <a href="https://github.com/Tekkieware" className="text-muted-foreground hover:text-foreground transition-colors">
             &gt; open github://io
           </a>
