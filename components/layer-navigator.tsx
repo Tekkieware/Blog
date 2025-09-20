@@ -5,6 +5,7 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import { ArrowRight } from "lucide-react"
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui-tailwind/card"
+import { count } from "console"
 
 // Export layers data so it can be used in other components
 export const layers = [
@@ -15,6 +16,7 @@ export const layers = [
     color: "indigo",
     slug: "frontend",
     icon: "🎨",
+    count: 12,
   },
   {
     id: "02",
@@ -23,6 +25,7 @@ export const layers = [
     color: "cyan",
     slug: "backend",
     icon: "⚙️",
+    count: 8,
   },
   {
     id: "03",
@@ -31,6 +34,7 @@ export const layers = [
     color: "orange",
     slug: "devops",
     icon: "🚀",
+    count: 5,
   },
   {
     id: "04",
@@ -39,6 +43,7 @@ export const layers = [
     color: "blue",
     slug: "architecture",
     icon: "🏗️",
+    count: 7,
   },
   {
     id: "05",
@@ -47,6 +52,7 @@ export const layers = [
     color: "emerald",
     slug: "peopleware",
     icon: "👥",
+    count: 4,
   },
   {
     id: "06",
@@ -55,11 +61,12 @@ export const layers = [
     color: "pink",
     slug: "overflow",
     icon: "💭",
+    count: 10,
   },
 ]
 
 // Helper function to get color based on layer
-const getLayerColor = (color: string) => {
+export const getLayerColor = (color: string) => {
   switch (color) {
     case "indigo":
       return "from-indigo-500/20 to-indigo-500/5 border-indigo-500/20 hover:border-indigo-500/40"

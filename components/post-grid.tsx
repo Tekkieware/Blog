@@ -8,7 +8,6 @@ import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { ArrowUpRight, Calendar } from "lucide-react"
 
-// Mock data for posts
 const posts = [
   {
     id: "1",
@@ -66,7 +65,6 @@ const posts = [
   },
 ]
 
-// Helper function to get color based on layer
 const getLayerColor = (layer: string) => {
   switch (layer) {
     case "frontend":
@@ -91,18 +89,35 @@ interface PostGridProps {
 }
 
 export function PostGrid({ activeLayer }: PostGridProps) {
-  // Filter posts based on active layer
   const filteredPosts = activeLayer === "all" ? posts : posts.filter((post) => post.layer === activeLayer)
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 },
+    },
+  }
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  }
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+    >
       {filteredPosts.length > 0 ? (
         filteredPosts.map((post) => (
-          <Link href={`/posts/${post.slug}`} key={post.id}>
-            <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
+          <Link href={`/posts/${post.slug}`} key={post.id} className="h-full">
+            <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }} className="h-full">
               <Card
                 className={cn(
-                  "h-full overflow-hidden transition-all duration-200 group border-2",
+                  "h-full flex flex-col overflow-hidden transition-all duration-200 group border-2",
                   `border-${getLayerColor(post.layer)}-400/30 hover:border-${getLayerColor(post.layer)}-400/50`,
                   "hover:shadow-lg dark:hover:shadow-[0_0_15px_rgba(0,240,255,0.15)]",
                 )}
@@ -127,7 +142,7 @@ export function PostGrid({ activeLayer }: PostGridProps) {
                     {post.title}
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="flex-1">
                   <p className="text-muted-foreground">{post.excerpt}</p>
                   <div className="flex flex-wrap gap-2 mt-4">
                     {post.tags.map((tag) => (
@@ -137,7 +152,7 @@ export function PostGrid({ activeLayer }: PostGridProps) {
                     ))}
                   </div>
                 </CardContent>
-                <CardFooter className="pt-0">
+                <CardFooter className="pt-0 mt-auto">
                   <Button
                     size="sm"
                     variant="ghost"
@@ -152,10 +167,17 @@ export function PostGrid({ activeLayer }: PostGridProps) {
           </Link>
         ))
       ) : (
-        <div className="col-span-3 text-center py-12">
-          <p className="text-muted-foreground">No posts found in this layer.</p>
-        </div>
+        <motion.div variants={itemVariants} className="col-span-full text-center py-16">
+          <div className="max-w-md mx-auto space-y-4">
+            <div className="text-6xl">🔍</div>
+            <h3 className="text-xl font-mono font-semibold">No posts found</h3>
+            <p className="text-muted-foreground">
+              No posts found in the <span className="font-mono font-semibold">{activeLayer}</span> layer.
+              Try selecting a different layer to explore more content.
+            </p>
+          </div>
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   )
 }
