@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Save, Eye, ImageIcon, X, Calendar, Clock, User, Tag, Wand2 } from "lucide-react"
+import { ArrowLeft, Save, Eye, ImageIcon, X, Calendar, Clock, User, Tag, Wand2, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -12,8 +12,8 @@ import { ImageUploadModal } from "@/components/image-upload-modal"
 import { MarkdownRenderer } from "@/components/markdown-renderer"
 import Link from "next/link"
 import { layers } from "@/components/layer-navigator"
-import { getRandomTemplate } from "@/components/cotent-template"
 import { EnhancedRichTextEditor } from "@/components/enhanced-rich-text-editor"
+import { getRandomTemplate } from "@/components/cotent-template"
 
 export default function NewPostPage() {
   const router = useRouter()
@@ -25,21 +25,23 @@ export default function NewPostPage() {
     excerpt: "",
     content: "",
     layer: "frontend",
-    tags: "",
+    tags: [] as string[],
     slug: "",
     date: "",
     author: "",
     readTime: "",
-    debug_notes: "",
+    debug_notes: [] as string[],
     coverImage: "",
     coverImageAlt: "",
   })
+
+  const [tagInput, setTagInput] = useState("")
+  const [debugNoteInput, setDebugNoteInput] = useState("")
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
 
-    // Auto-generate slug from title
     if (name === "title") {
       const slug = value
         .toLowerCase()
@@ -71,6 +73,54 @@ export default function NewPostPage() {
     }))
   }
 
+  const addTag = () => {
+    if (tagInput.trim() && !formData.tags.includes(tagInput.trim())) {
+      setFormData((prev) => ({
+        ...prev,
+        tags: [...prev.tags, tagInput.trim()],
+      }))
+      setTagInput("")
+    }
+  }
+
+  const removeTag = (tagToRemove: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      tags: prev.tags.filter((tag) => tag !== tagToRemove),
+    }))
+  }
+
+  const handleTagKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault()
+      addTag()
+    }
+  }
+
+  const addDebugNote = () => {
+    if (debugNoteInput.trim()) {
+      setFormData((prev) => ({
+        ...prev,
+        debug_notes: [...prev.debug_notes, debugNoteInput.trim()],
+      }))
+      setDebugNoteInput("")
+    }
+  }
+
+  const removeDebugNote = (noteToRemove: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      debug_notes: prev.debug_notes.filter((note) => note !== noteToRemove),
+    }))
+  }
+
+  const handleDebugNoteKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault()
+      addDebugNote()
+    }
+  }
+
   const handleLoadTemplate = () => {
     const template = getRandomTemplate()
     setFormData((prev) => ({
@@ -78,9 +128,8 @@ export default function NewPostPage() {
       title: template.title,
       excerpt: template.excerpt,
       content: template.content,
-      tags: template.tags,
-      debug_notes: template.debug_notes,
-      // Auto-generate slug from template title
+      tags: template.tags.split(",").map((tag) => tag.trim()),
+      debug_notes: template.debug_notes.split("\n").filter((note) => note.trim()),
       slug: template.title
         .toLowerCase()
         .replace(/[^\w\s]/g, "")
@@ -94,12 +143,10 @@ export default function NewPostPage() {
 
     const post = {
       ...formData,
-      debug_notes: formData.debug_notes.split("\n"),
     }
 
     console.log(post)
 
-    // In a real app, this would send data to an API
     setTimeout(() => {
       alert("Post created successfully!")
       setIsSubmitting(false)
@@ -109,7 +156,6 @@ export default function NewPostPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur">
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center">
@@ -158,9 +204,7 @@ export default function NewPostPage() {
               <div className="container pb-16">
                 <div className="grid grid-cols-1 lg:grid-cols-[1fr] gap-8">
                   <article className="min-w-0">
-                    {/* Post Header */}
                     <header className="mb-12 space-y-6">
-                      {/* Cover Image */}
                       {formData.coverImage && (
                         <div className="aspect-video overflow-hidden rounded-lg mb-8">
                           <img
@@ -171,7 +215,6 @@ export default function NewPostPage() {
                         </div>
                       )}
 
-                      {/* Meta Information */}
                       <div className="flex flex-wrap items-center gap-4 text-sm">
                         <Badge
                           variant="outline"
@@ -199,7 +242,6 @@ export default function NewPostPage() {
                         )}
                       </div>
 
-                      {/* Title and Excerpt */}
                       <div className="space-y-4">
                         <h1 className="text-4xl lg:text-5xl font-bold tracking-tight text-foreground font-mono">
                           {formData.title || "Untitled Post"}
@@ -209,20 +251,18 @@ export default function NewPostPage() {
                         )}
                       </div>
 
-                      {/* Tags */}
-                      {formData.tags && (
+                      {formData.tags.length > 0 && (
                         <div className="flex flex-wrap gap-2">
-                          {formData.tags.split(",").map((tag, index) => (
+                          {formData.tags.map((tag, index) => (
                             <Badge key={index} variant="secondary" className="text-xs font-mono">
                               <Tag className="h-3 w-3 mr-1" />
-                              {tag.trim()}
+                              {tag}
                             </Badge>
                           ))}
                         </div>
                       )}
                     </header>
 
-                    {/* Content */}
                     <div className="prose prose-lg max-w-none">
                       {formData.content ? (
                         <MarkdownRenderer content={formData.content} />
@@ -231,8 +271,7 @@ export default function NewPostPage() {
                       )}
                     </div>
 
-                    {/* Debug Notes */}
-                    {formData.debug_notes && (
+                    {formData.debug_notes.length > 0 && (
                       <div className="mt-12">
                         <Card className="border-primary/20 bg-gradient-subtle shadow-soft">
                           <div className="p-6">
@@ -241,15 +280,12 @@ export default function NewPostPage() {
                               Debug Notes
                             </h4>
                             <ul className="space-y-3 text-sm">
-                              {formData.debug_notes
-                                .split("\n")
-                                .filter((note) => note.trim())
-                                .map((note, index) => (
-                                  <li key={index} className="flex items-start">
-                                    <span className="text-primary mr-3 mt-1">•</span>
-                                    <span className="text-muted-foreground">{note}</span>
-                                  </li>
-                                ))}
+                              {formData.debug_notes.map((note, index) => (
+                                <li key={index} className="flex items-start">
+                                  <span className="text-primary mr-3 mt-1">•</span>
+                                  <span className="text-muted-foreground">{note}</span>
+                                </li>
+                              ))}
                             </ul>
                           </div>
                         </Card>
@@ -266,7 +302,6 @@ export default function NewPostPage() {
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Cover Image Section */}
                   <div className="space-y-2">
                     <label className="block text-sm font-medium">Cover Image</label>
                     {formData.coverImage ? (
@@ -425,18 +460,49 @@ export default function NewPostPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <label htmlFor="tags" className="block text-sm font-medium">
-                        Tags (comma separated)
-                      </label>
-                      <input
-                        id="tags"
-                        name="tags"
-                        type="text"
-                        value={formData.tags}
-                        onChange={handleChange}
-                        placeholder="react, architecture, patterns"
-                        className="block w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
-                      />
+                      <label className="block text-sm font-medium">Tags</label>
+                      <div className="space-y-3">
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={tagInput}
+                            onChange={(e) => setTagInput(e.target.value)}
+                            onKeyPress={handleTagKeyPress}
+                            placeholder="Add a tag and press Enter"
+                            className="flex-1 px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={addTag}
+                            className="px-3 bg-transparent"
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        {formData.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-2">
+                            {formData.tags.map((tag, index) => (
+                              <Badge
+                                key={index}
+                                variant="secondary"
+                                className="text-xs font-mono flex items-center gap-1 pr-1"
+                              >
+                                <Tag className="h-3 w-3" />
+                                {tag}
+                                <button
+                                  type="button"
+                                  onClick={() => removeTag(tag)}
+                                  className="ml-1 hover:bg-destructive/20 rounded-full p-0.5 transition-colors"
+                                >
+                                  <X className="h-3 w-3" />
+                                </button>
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -453,17 +519,48 @@ export default function NewPostPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <label htmlFor="debug_notes" className="block text-sm font-medium">
-                      Debug Notes (one per line)
-                    </label>
-                    <textarea
-                      id="debug_notes"
-                      name="debug_notes"
-                      rows={4}
-                      value={formData.debug_notes}
-                      onChange={handleChange}
-                      className="block w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
-                    />
+                    <label className="block text-sm font-medium">Debug Notes</label>
+                    <div className="space-y-3">
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={debugNoteInput}
+                          onChange={(e) => setDebugNoteInput(e.target.value)}
+                          onKeyPress={handleDebugNoteKeyPress}
+                          placeholder="Add a debug note and press Enter"
+                          className="flex-1 px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={addDebugNote}
+                          className="px-3 bg-transparent"
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      {formData.debug_notes.length > 0 && (
+                        <div className="space-y-2">
+                          {formData.debug_notes.map((note, index) => (
+                            <div
+                              key={index}
+                              className="flex items-start gap-2 p-3 bg-muted/50 rounded-md border border-border/50"
+                            >
+                              <span className="text-primary mt-1">•</span>
+                              <span className="flex-1 text-sm text-muted-foreground">{note}</span>
+                              <button
+                                type="button"
+                                onClick={() => removeDebugNote(note)}
+                                className="hover:bg-destructive/20 rounded-full p-1 transition-colors"
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </form>
               </CardContent>
@@ -472,7 +569,6 @@ export default function NewPostPage() {
         </div>
       </main>
 
-      {/* Cover Image Upload Modal */}
       <ImageUploadModal
         isOpen={showCoverImageModal}
         onClose={() => setShowCoverImageModal(false)}
