@@ -8,29 +8,56 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui-tailwi
 import { Badge } from "@/components/ui-tailwind/badge"
 import { deleteCookie } from "cookies-next"
 import Link from "next/link"
-
-// Mock data for posts (in a real app, this would come from an API or database)
-import { posts } from "@/lib/mock-data"
+import { getPosts, deletePost } from "@/lib/services/postService";
+import { IPost } from "@/models/post";
+import { toast } from "sonner";
 
 export default function AdminPage() {
   const [searchTerm, setSearchTerm] = useState("")
-  const [filteredPosts, setFilteredPosts] = useState(posts)
+  const [posts, setPosts] = useState<IPost[]>([]);
+  const [loading, setLoading] = useState(true);
   const router = useRouter()
 
   useEffect(() => {
-    // Filter posts based on search term
-    const results = posts.filter(
-      (post) =>
-        post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        post.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        post.layer.toLowerCase().includes(searchTerm.toLowerCase()),
-    )
-    setFilteredPosts(results)
-  }, [searchTerm])
+    const fetchPosts = async () => {
+      try {
+        const fetchedPosts = await getPosts();
+        setPosts(fetchedPosts);
+      } catch (error) {
+        toast.error("Failed to fetch posts.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, []);
+
+  const handleDelete = async (id: string) => {
+    const toastId = toast.loading("Deleting post...");
+    try {
+      await deletePost(id);
+      setPosts(posts.filter((post) => post._id !== id));
+      toast.success("Post deleted successfully!", { id: toastId });
+    } catch (error) {
+      toast.error("Failed to delete post.", { id: toastId });
+    }
+  };
 
   const handleLogout = () => {
     deleteCookie("auth-token")
     router.push("/login")
+  }
+
+  const filteredPosts = posts.filter(
+    (post) =>
+      post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      post.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      post.layer.toLowerCase().includes(searchTerm.toLowerCase()),
+  )
+
+  if (loading) {
+    return <div>Loading...</div>;
   }
 
   return (
@@ -99,7 +126,7 @@ export default function AdminPage() {
                   <tbody>
                     {filteredPosts.length > 0 ? (
                       filteredPosts.map((post) => (
-                        <tr key={post.id} className="border-b border-border hover:bg-muted/50">
+                        <tr key={post._id} className="border-b border-border hover:bg-muted/50">
                           <td className="py-3 px-4">
                             <div className="font-medium">{post.title}</div>
                             <div className="text-sm text-muted-foreground hidden sm:block">
@@ -114,14 +141,14 @@ export default function AdminPage() {
                               {post.layer}
                             </Badge>
                           </td>
-                          <td className="py-3 px-4 hidden lg:table-cell text-muted-foreground">{post.date}</td>
+                          <td className="py-3 px-4 hidden lg:table-cell text-muted-foreground">{new Date(post.createdAt).toLocaleDateString()}</td>
                           <td className="py-3 px-4 text-right">
                             <div className="flex justify-end gap-2">
                               <Button
                                 variant="outline"
                                 size="sm"
                                 className="h-8 w-8 p-0 border-primary/20 hover:bg-primary/10 hover:border-primary/30"
-                                onClick={() => router.push(`/admin/posts/edit/${post.id}`)}
+                                onClick={() => router.push(`/admin/posts/edit/${post._id}`)}
                               >
                                 <Edit className="h-4 w-4 text-primary" />
                                 <span className="sr-only">Edit</span>
@@ -130,12 +157,7 @@ export default function AdminPage() {
                                 variant="outline"
                                 size="sm"
                                 className="h-8 w-8 p-0 border-red-500/20 hover:bg-red-500/10 hover:border-red-500/30"
-                                onClick={() => {
-                                  if (confirm("Are you sure you want to delete this post?")) {
-                                    // Delete post logic would go here
-                                    alert(`Post "${post.title}" would be deleted`)
-                                  }
-                                }}
+                                onClick={() => handleDelete(post._id)}
                               >
                                 <Trash2 className="h-4 w-4 text-red-500" />
                                 <span className="sr-only">Delete</span>
