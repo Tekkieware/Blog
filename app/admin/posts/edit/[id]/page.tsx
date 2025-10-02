@@ -383,15 +383,16 @@ export default function EditPostPage({ params: promiseParams }: { params: Promis
                       <label htmlFor="author" className="block text-sm font-medium">
                         Author
                       </label>
-                      <input
+                      <select
                         id="author"
                         name="author"
-                        type="text"
                         required
                         value={formData.author}
                         onChange={handleChange}
                         className="block w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
-                      />
+                      >
+                        <option value="Isaiah Ozadhe">Isaiah Ozadhe</option>
+                      </select>
                     </div>
                   </div>
 
