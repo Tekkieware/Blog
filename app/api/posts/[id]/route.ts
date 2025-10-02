@@ -19,6 +19,15 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     await dbConnect();
     try {
         const postData = await request.json();
+        if (postData.slug) {
+            let slug = postData.slug;
+            let existingPost = await Post.findOne({ slug, _id: { $ne: params.id } });
+            while (existingPost) {
+                slug = `${postData.slug}-${Math.random().toString(36).substring(2, 7)}`;
+                existingPost = await Post.findOne({ slug, _id: { $ne: params.id } });
+            }
+            postData.slug = slug;
+        }
         const updatedPost = await Post.findByIdAndUpdate(params.id, postData, { new: true });
         if (!updatedPost) {
             return NextResponse.json({ message: "Post not found" }, { status: 404 });
