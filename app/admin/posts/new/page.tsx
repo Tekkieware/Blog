@@ -14,6 +14,8 @@ import Link from "next/link"
 import { layers } from "@/components/layer-navigator"
 import { EnhancedRichTextEditor } from "@/components/enhanced-rich-text-editor"
 import { getRandomTemplate } from "@/components/cotent-template"
+import { toast } from "sonner"
+import { createPost } from "@/lib/services/postService"
 
 export default function NewPostPage() {
   const router = useRouter()
@@ -27,12 +29,10 @@ export default function NewPostPage() {
     layer: "frontend",
     tags: [] as string[],
     slug: "",
-    date: "",
     author: "",
-    readTime: "",
     debug_notes: [] as string[],
     coverImage: "",
-    coverImageAlt: "",
+    coverImageAlt: ""
   })
 
   const [tagInput, setTagInput] = useState("")
@@ -137,22 +137,49 @@ export default function NewPostPage() {
     }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const toastId = toast.loading("Creating post...");
+    setIsSubmitting(true);
 
-    const post = {
-      ...formData,
+    // Validation
+    const errors: string[] = [];
+
+    if (!formData.title.trim()) errors.push("Title is required.");
+    if (!formData.excerpt.trim()) errors.push("Excerpt is required.");
+    if (!formData.content.trim()) errors.push("Content is required.");
+    if (!formData.slug.trim()) errors.push("Slug is required.");
+    if (!formData.author.trim()) errors.push("Author is required.");
+    if (!formData.coverImage.trim()) errors.push("Cover image is required.");
+    if (!formData.coverImageAlt.trim()) errors.push("Cover image alt text is required.");
+    if (formData.tags.length === 0) errors.push("At least one tag is required.");
+
+    if (errors.length > 0) {
+      toast.error(
+        <div>
+          {errors.map((err, i) => (
+            <div key={i}>• {err}</div>
+          ))}
+        </div>,
+        { id: toastId }
+      );
+      setIsSubmitting(false);
+      return;
     }
 
-    console.log(post)
+    try {
+      const post = { ...formData };
+      await createPost(post);
+      toast.success("Post created successfully!", { id: toastId });
+      setIsSubmitting(false);
+      router.push("/admin");
+    } catch (error) {
+      toast.error("Failed to create post", { id: toastId });
+      setIsSubmitting(false);
+    }
+  };
 
-    setTimeout(() => {
-      alert("Post created successfully!")
-      setIsSubmitting(false)
-      router.push("/admin")
-    }, 1000)
-  }
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -191,7 +218,7 @@ export default function NewPostPage() {
               className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
               <Save className="h-4 w-4 mr-2" />
-              {isSubmitting ? "Saving..." : "Save Post"}
+              {isSubmitting ? "Processing..." : "Publish Post"}
             </Button>
           </div>
         </div>
@@ -222,18 +249,18 @@ export default function NewPostPage() {
                         >
                           {formData.layer}
                         </Badge>
-                        {formData.date && (
+                        {/* {formData.date && (
                           <div className="flex items-center text-muted-foreground">
                             <Calendar className="mr-2 h-4 w-4" />
                             {formData.date}
                           </div>
-                        )}
-                        {formData.readTime && (
+                        )} */}
+                        {/* {formData.readTime && (
                           <div className="flex items-center text-muted-foreground">
                             <Clock className="mr-2 h-4 w-4" />
                             {formData.readTime}
                           </div>
-                        )}
+                        )} */}
                         {formData.author && (
                           <div className="flex items-center text-muted-foreground">
                             <User className="mr-2 h-4 w-4" />
@@ -379,7 +406,7 @@ export default function NewPostPage() {
                         className="block w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
                       />
                     </div>
-                    <div className="space-y-2">
+                    {/* <div className="space-y-2">
                       <label htmlFor="date" className="block text-sm font-medium">
                         Date
                       </label>
@@ -392,7 +419,7 @@ export default function NewPostPage() {
                         onChange={handleChange}
                         className="block w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
                       />
-                    </div>
+                    </div> */}
                     <div className="space-y-2">
                       <label htmlFor="author" className="block text-sm font-medium">
                         Author
@@ -403,20 +430,6 @@ export default function NewPostPage() {
                         type="text"
                         required
                         value={formData.author}
-                        onChange={handleChange}
-                        className="block w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label htmlFor="readTime" className="block text-sm font-medium">
-                        Read Time
-                      </label>
-                      <input
-                        id="readTime"
-                        name="readTime"
-                        type="text"
-                        required
-                        value={formData.readTime}
                         onChange={handleChange}
                         className="block w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
                       />

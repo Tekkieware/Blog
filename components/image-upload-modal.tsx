@@ -10,21 +10,24 @@ import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
 import { Upload, Crop, RotateCw, Save, X } from "lucide-react"
 import { Card } from "@/components/ui/card"
+import { uploadFileToCloudinary } from "@/lib/utils/cloudinary"
+import { toast } from "sonner"
 
 interface ImageUploadModalProps {
     isOpen: boolean
     onClose: () => void
     onSave: (imageUrl: string, altText: string) => void
 }
-
-// Mock function - replace with actual Cloudinary upload
 const uploadToCloudinary = async (file: File): Promise<string> => {
-    // Simulate upload delay
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-
-    // In real implementation, this would upload to Cloudinary and return the URL
-    // For now, return a placeholder URL
-    return `https://images.unsplash.com/photo-${Date.now()}?w=800&h=600&fit=crop`
+    const toastId = toast.loading("Uploading image...")
+    try {
+        const url = await uploadFileToCloudinary(file, "blog_images")
+        toast.success("Image uploaded successfully!", { id: toastId })
+        return url
+    } catch (error) {
+        toast.error("Image upload failed.", { id: toastId })
+        throw error
+    }
 }
 
 export function ImageUploadModal({ isOpen, onClose, onSave }: ImageUploadModalProps) {
