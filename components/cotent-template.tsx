@@ -1,11 +1,11 @@
 "use client"
 
 export const contentTemplates = {
-    technical: {
-        title: "The Art of Component Composition",
-        excerpt:
-            "Discover advanced patterns for building maintainable React applications through effective component composition.",
-        content: `![Developer Workspace](/placeholder.svg?height=400&width=800&query=developer workspace with code editor)
+  technical: {
+    title: "The Art of Component Composition",
+    excerpt:
+      "Discover advanced patterns for building maintainable React applications through effective component composition.",
+    content: `![Developer Workspace](https://images.unsplash.com/photo-1504384308090-c894fdcc538d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80)
 
 # Introduction
 
@@ -86,7 +86,7 @@ function ProfileHeader({ user }) {
 }
 \`\`\`
 
-![Component Architecture](/placeholder.svg?height=300&width=600&query=component architecture diagram)
+![Component Architecture](https://images.unsplash.com/photo-1504384308090-c894fdcc538d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80)
 
 ## Advanced Patterns
 
@@ -133,18 +133,18 @@ const Button = ({ children, variant = "default", ...props }) => (
 Component composition is one of the most powerful patterns in React development. By breaking down complex UIs into smaller, focused components, you create code that is more maintainable, reusable, and testable.
 
 > 🚀 **Next Steps**: Try refactoring one of your existing components using these composition patterns. Start with the compound component pattern - it's often the most impactful!`,
-        tags: "react, architecture, patterns",
-        debug_notes: `Consider using React Context for deeply nested components
+    tags: "react, architecture, patterns",
+    debug_notes: `Consider using React Context for deeply nested components
 Avoid prop drilling more than 2 levels deep
 Remember to memoize expensive calculations
 Use TypeScript for better component interfaces
 Test component composition boundaries`,
-    },
+  },
 
-    tutorial: {
-        title: "Building Your First Next.js App",
-        excerpt: "A step-by-step guide to creating a modern web application with Next.js, from setup to deployment.",
-        content: `![Next.js Development](/placeholder.svg?height=400&width=800&query=nextjs development setup)
+  tutorial: {
+    title: "Building Your First Next.js App",
+    excerpt: "A step-by-step guide to creating a modern web application with Next.js, from setup to deployment.",
+    content: `![https://images.unsplash.com/photo-1504384308090-c894fdcc538d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80)
 
 # Getting Started with Next.js
 
@@ -212,15 +212,15 @@ export function Header() {
 ## Conclusion
 
 You've successfully created your first Next.js application! From here, you can continue building more features and exploring the framework's capabilities.`,
-        tags: "nextjs, tutorial, react",
-        debug_notes: `Remember to use TypeScript for better development experience
+    tags: "nextjs, tutorial, react",
+    debug_notes: `Remember to use TypeScript for better development experience
 Consider using Tailwind CSS for styling
 Test your components as you build them
 Deploy early and often to catch issues`,
-    },
+  },
 }
 
 export function getRandomTemplate() {
-    const templates = Object.values(contentTemplates)
-    return templates[Math.floor(Math.random() * templates.length)]
+  const templates = Object.values(contentTemplates)
+  return templates[Math.floor(Math.random() * templates.length)]
 }
