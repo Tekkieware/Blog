@@ -2,6 +2,7 @@
 import mongoose, { Document, Model, model, models, Schema } from "mongoose";
 
 export interface IPost extends Document {
+    _id: string;
     title: string;
     content: string;
     author: string;
@@ -12,7 +13,10 @@ export interface IPost extends Document {
     excerpt: string;
     slug: string;
     layer: string;
+    createdAt: string;
+    updatedAt: string
 }
+
 
 const PostSchema = new Schema<IPost>(
     {
