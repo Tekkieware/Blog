@@ -7,6 +7,7 @@ import Header from "@/components/header"
 import Footer from "@/components/footer"
 import CommandPalette from "@/components/command-palette"
 import { cn } from "@/lib/utils"
+import { Toaster } from "@/components/ui/sonner"
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -44,6 +45,7 @@ export default function RootLayout({
             <Header />
             <CommandPalette />
             <main className="flex-1">{children}</main>
+            <Toaster />
             <Footer />
           </div>
         </ThemeProvider>
