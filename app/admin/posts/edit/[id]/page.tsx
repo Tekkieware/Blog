@@ -10,7 +10,9 @@ import { MarkdownRenderer } from "@/components/markdown-renderer"
 import Link from "next/link"
 import { layers } from "@/components/layer-navigator"
 import { EnhancedRichTextEditor } from "@/components/enhanced-rich-text-editor"
-import { posts } from "@/lib/mock-data"
+import { getPost, updatePost, deletePost } from "@/lib/services/postService"
+import { IPost } from "@/models/post"
+import { toast } from "sonner"
 
 export default function EditPostPage({ params: promiseParams }: { params: Promise<{ id: string }> }) {
   const params = React.use(promiseParams);
@@ -18,16 +20,14 @@ export default function EditPostPage({ params: promiseParams }: { params: Promis
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showPreview, setShowPreview] = useState(false)
   const [showCoverImageModal, setShowCoverImageModal] = useState(false)
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Partial<IPost>>({
     title: "",
     excerpt: "",
     content: "",
     layer: "frontend",
     tags: [] as string[],
     slug: "",
-    date: "",
     author: "",
-    readTime: "",
     debug_notes: [] as string[],
     coverImage: "",
     coverImageAlt: "",
@@ -37,27 +37,18 @@ export default function EditPostPage({ params: promiseParams }: { params: Promis
   const [debugNoteInput, setDebugNoteInput] = useState("")
 
   useEffect(() => {
-    const post = posts.find((p: any) => p.id === params.id)
+    const fetchPost = async () => {
+      try {
+        const post = await getPost(params.id);
+        setFormData(post);
+      } catch (error) {
+        toast.error("Failed to fetch post.");
+        router.push("/admin");
+      }
+    };
 
-    if (post) {
-      setFormData({
-        title: post.title,
-        excerpt: post.excerpt,
-        content: post.content || "",
-        layer: post.layer,
-        tags: post.tags,
-        slug: post.slug,
-        date: post.date,
-        author: post.author,
-        readTime: post.readTime,
-        debug_notes: post.debug_notes,
-        coverImage: post.coverImage || "",
-        coverImageAlt: post.coverImageAlt || "",
-      })
-    } else {
-      router.push("/admin")
-    }
-  }, [params.id, router])
+    fetchPost();
+  }, [params.id, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -95,10 +86,10 @@ export default function EditPostPage({ params: promiseParams }: { params: Promis
   }
 
   const addTag = () => {
-    if (tagInput.trim() && !formData.tags.includes(tagInput.trim())) {
+    if (tagInput.trim() && !formData.tags?.includes(tagInput.trim())) {
       setFormData((prev) => ({
         ...prev,
-        tags: [...prev.tags, tagInput.trim()],
+        tags: [...(prev.tags || []), tagInput.trim()],
       }))
       setTagInput("")
     }
@@ -107,7 +98,7 @@ export default function EditPostPage({ params: promiseParams }: { params: Promis
   const removeTag = (tagToRemove: string) => {
     setFormData((prev) => ({
       ...prev,
-      tags: prev.tags.filter((tag) => tag !== tagToRemove),
+      tags: prev.tags?.filter((tag) => tag !== tagToRemove),
     }))
   }
 
@@ -122,7 +113,7 @@ export default function EditPostPage({ params: promiseParams }: { params: Promis
     if (debugNoteInput.trim()) {
       setFormData((prev) => ({
         ...prev,
-        debug_notes: [...prev.debug_notes, debugNoteInput.trim()],
+        debug_notes: [...(prev.debug_notes || []), debugNoteInput.trim()],
       }))
       setDebugNoteInput("")
     }
@@ -131,7 +122,7 @@ export default function EditPostPage({ params: promiseParams }: { params: Promis
   const removeDebugNote = (noteToRemove: string) => {
     setFormData((prev) => ({
       ...prev,
-      debug_notes: prev.debug_notes.filter((note) => note !== noteToRemove),
+      debug_notes: prev.debug_notes?.filter((note) => note !== noteToRemove),
     }))
   }
 
@@ -142,29 +133,32 @@ export default function EditPostPage({ params: promiseParams }: { params: Promis
     }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const toastId = toast.loading("Updating post...");
+    setIsSubmitting(true);
 
-    const post = {
-      ...formData,
+    try {
+      await updatePost(params.id, formData);
+      toast.success("Post updated successfully!", { id: toastId });
+      setIsSubmitting(false);
+      router.push("/admin");
+    } catch (error) {
+      toast.error("Failed to update post", { id: toastId });
+      setIsSubmitting(false);
     }
+  };
 
-    console.log(post)
-
-    setTimeout(() => {
-      alert("Post updated successfully!")
-      setIsSubmitting(false)
-      router.push("/admin")
-    }, 1000)
-  }
-
-  const handleDelete = () => {
-    if (confirm("Are you sure you want to delete this post?")) {
-      alert(`Post would be deleted`)
-      router.push("/admin")
+  const handleDelete = async () => {
+    const toastId = toast.loading("Deleting post...");
+    try {
+      await deletePost(params.id);
+      toast.success("Post deleted successfully!", { id: toastId });
+      router.push("/admin");
+    } catch (error) {
+      toast.error("Failed to delete post.", { id: toastId });
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -234,16 +228,10 @@ export default function EditPostPage({ params: promiseParams }: { params: Promis
                         >
                           {formData.layer}
                         </Badge>
-                        {formData.date && (
+                        {formData.createdAt && (
                           <div className="flex items-center text-muted-foreground">
                             <Calendar className="mr-2 h-4 w-4" />
-                            {formData.date}
-                          </div>
-                        )}
-                        {formData.readTime && (
-                          <div className="flex items-center text-muted-foreground">
-                            <Clock className="mr-2 h-4 w-4" />
-                            {formData.readTime}
+                            {new Date(formData.createdAt).toLocaleDateString()}
                           </div>
                         )}
                         {formData.author && (
@@ -263,7 +251,7 @@ export default function EditPostPage({ params: promiseParams }: { params: Promis
                         )}
                       </div>
 
-                      {formData.tags.length > 0 && (
+                      {formData.tags && formData.tags.length > 0 && (
                         <div className="flex flex-wrap gap-2">
                           {formData.tags.map((tag, index) => (
                             <Badge key={index} variant="secondary" className="text-xs font-mono">
@@ -283,7 +271,7 @@ export default function EditPostPage({ params: promiseParams }: { params: Promis
                       )}
                     </div>
 
-                    {formData.debug_notes.length > 0 && (
+                    {formData.debug_notes && formData.debug_notes.length > 0 && (
                       <div className="mt-12">
                         <Card className="border-primary/20 bg-gradient-subtle shadow-soft">
                           <div className="p-6">
@@ -392,20 +380,6 @@ export default function EditPostPage({ params: promiseParams }: { params: Promis
                       />
                     </div>
                     <div className="space-y-2">
-                      <label htmlFor="date" className="block text-sm font-medium">
-                        Date
-                      </label>
-                      <input
-                        id="date"
-                        name="date"
-                        type="date"
-                        required
-                        value={formData.date}
-                        onChange={handleChange}
-                        className="block w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
-                      />
-                    </div>
-                    <div className="space-y-2">
                       <label htmlFor="author" className="block text-sm font-medium">
                         Author
                       </label>
@@ -415,20 +389,6 @@ export default function EditPostPage({ params: promiseParams }: { params: Promis
                         type="text"
                         required
                         value={formData.author}
-                        onChange={handleChange}
-                        className="block w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label htmlFor="readTime" className="block text-sm font-medium">
-                        Read Time
-                      </label>
-                      <input
-                        id="readTime"
-                        name="readTime"
-                        type="text"
-                        required
-                        value={formData.readTime}
                         onChange={handleChange}
                         className="block w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
                       />
@@ -493,7 +453,7 @@ export default function EditPostPage({ params: promiseParams }: { params: Promis
                             <Plus className="h-4 w-4" />
                           </Button>
                         </div>
-                        {formData.tags.length > 0 && (
+                        {formData.tags && formData.tags.length > 0 && (
                           <div className="flex flex-wrap gap-2">
                             {formData.tags.map((tag, index) => (
                               <Badge
@@ -523,7 +483,7 @@ export default function EditPostPage({ params: promiseParams }: { params: Promis
                       Content
                     </label>
                     <EnhancedRichTextEditor
-                      value={formData.content}
+                      value={formData.content || ''}
                       onChange={handleContentChange}
                       placeholder="Start writing your post..."
                       className="min-h-[400px]"
@@ -552,7 +512,7 @@ export default function EditPostPage({ params: promiseParams }: { params: Promis
                           <Plus className="h-4 w-4" />
                         </Button>
                       </div>
-                      {formData.debug_notes.length > 0 && (
+                      {formData.debug_notes && formData.debug_notes.length > 0 && (
                         <div className="space-y-2">
                           {formData.debug_notes.map((note, index) => (
                             <div
