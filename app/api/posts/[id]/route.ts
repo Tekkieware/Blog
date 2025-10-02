@@ -1,9 +1,8 @@
-
 import dbConnect from "@/lib/db";
 import Post from "@/models/post";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: { id: string } }) {
     await dbConnect();
     try {
         const post = await Post.findById(params.id);
@@ -16,7 +15,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: { id: string } }) {
     await dbConnect();
     try {
         const postData = await request.json();
@@ -30,7 +29,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: { id: string } }) {
     await dbConnect();
     try {
         const deletedPost = await Post.findByIdAndDelete(params.id);
