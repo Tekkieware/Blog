@@ -34,13 +34,15 @@ export default function AdminPage() {
   }, []);
 
   const handleDelete = async (id: string) => {
-    const toastId = toast.loading("Deleting post...");
-    try {
-      await deletePost(id);
-      setPosts(posts.filter((post) => post._id !== id));
-      toast.success("Post deleted successfully!", { id: toastId });
-    } catch (error) {
-      toast.error("Failed to delete post.", { id: toastId });
+    if (confirm("Are you sure you want to delete this post?")) {
+        const toastId = toast.loading("Deleting post...");
+        try {
+          await deletePost(id);
+          setPosts(posts.filter((post) => post._id !== id));
+          toast.success("Post deleted successfully!", { id: toastId });
+        } catch (error) {
+          toast.error("Failed to delete post.", { id: toastId });
+        }
     }
   };
 

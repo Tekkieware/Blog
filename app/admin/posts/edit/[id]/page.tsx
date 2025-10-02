@@ -150,13 +150,15 @@ export default function EditPostPage({ params: promiseParams }: { params: Promis
   };
 
   const handleDelete = async () => {
-    const toastId = toast.loading("Deleting post...");
-    try {
-      await deletePost(params.id);
-      toast.success("Post deleted successfully!", { id: toastId });
-      router.push("/admin");
-    } catch (error) {
-      toast.error("Failed to delete post.", { id: toastId });
+    if (confirm("Are you sure you want to delete this post?")) {
+        const toastId = toast.loading("Deleting post...");
+        try {
+          await deletePost(params.id);
+          toast.success("Post deleted successfully!", { id: toastId });
+          router.push("/admin");
+        } catch (error) {
+          toast.error("Failed to delete post.", { id: toastId });
+        }
     }
   };
 
