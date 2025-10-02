@@ -17,6 +17,14 @@ export async function getPost(id: string): Promise<IPost> {
     return response.json();
 }
 
+export async function getPostBySlug(slug: string): Promise<IPost> {
+    const response = await fetch(`/api/posts/slug/${slug}`);
+    if (!response.ok) {
+        throw new Error("Failed to fetch post");
+    }
+    return response.json();
+}
+
 export async function createPost(post: Partial<IPost>): Promise<IPost> {
     const response = await fetch("/api/posts", {
         method: "POST",
