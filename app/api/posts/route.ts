@@ -18,7 +18,13 @@ export async function POST(request: NextRequest) {
     await dbConnect();
     try {
         const postData = await request.json();
-        console.log(postData);
+        let slug = postData.slug;
+        let existingPost = await Post.findOne({ slug });
+        while (existingPost) {
+            slug = `${postData.slug}-${Math.random().toString(36).substring(2, 7)}`;
+            existingPost = await Post.findOne({ slug });
+        }
+        postData.slug = slug;
         const post = new Post(postData);
         await post.save();
         return NextResponse.json(post, { status: 201 });
