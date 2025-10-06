@@ -11,6 +11,8 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { getPosts } from "@/lib/services/postService"
 import { IPost } from "@/models/post"
 
+import { FeaturedMarqueeSkeleton } from "./featured-marquee-skeleton"
+
 // Helper function to get color based on layer
 const getLayerColor = (layer: string) => {
   switch (layer) {
@@ -35,11 +37,14 @@ export function FeaturedMarquee() {
   const [isPaused, setIsPaused] = useState(false)
   const marqueeRef = useRef<HTMLDivElement>(null)
   const [posts, setPosts] = useState<IPost[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function fetchPosts() {
+      setLoading(true)
       const fetchedPosts = await getPosts()
       setPosts(fetchedPosts)
+      setLoading(false)
     }
 
     fetchPosts()
@@ -62,6 +67,10 @@ export function FeaturedMarquee() {
       delete window.toggleMarqueePause
     }
   }, [])
+
+  if (loading) {
+    return <FeaturedMarqueeSkeleton />
+  }
 
   return (
     <div className="w-full space-y-16">
