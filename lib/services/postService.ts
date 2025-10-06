@@ -25,6 +25,14 @@ export async function getPostBySlug(slug: string): Promise<IPost> {
     return response.json();
 }
 
+export async function getPostsByLayer(layer: string): Promise<IPost[]> {
+    const response = await fetch(`/api/posts/layer/${layer}`);
+    if (!response.ok) {
+        throw new Error("Failed to fetch posts by layer");
+    }
+    return response.json();
+}
+
 export async function createPost(post: Partial<IPost>): Promise<IPost> {
     const response = await fetch("/api/posts", {
         method: "POST",
