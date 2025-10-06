@@ -1,18 +1,16 @@
 
 import { Skeleton } from "@/components/ui/skeleton"
+import { Card, CardContent, CardHeader } from "./ui/card"
+import { Car } from "lucide-react"
+import { PostCardSkeleton } from "./post-card-skeleton"
 
 export function FeaturedMarqueeSkeleton() {
   return (
-    <div className="w-full space-y-16">
-      <div className="relative w-full overflow-hidden">
-        <div className="flex gap-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="shrink-0">
-              <Skeleton className="w-[320px] h-[200px]" />
-            </div>
-          ))}
-        </div>
-      </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {Array.from({ length: 3 }).map((_, i) => (
+        <PostCardSkeleton key={i} />
+      ))}
+
     </div>
   )
 }
