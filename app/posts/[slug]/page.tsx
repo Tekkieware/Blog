@@ -11,6 +11,7 @@ import StickyBackButton from "@/components/sticky-back-button";
 import React, { useEffect, useState } from "react";
 import PostDetailSkeleton from "@/components/post-detail-skeleton";
 import { IPost } from "@/models/post";
+import Image from "next/image";
 
 const generateSlug = (text: string): string => {
   return text
@@ -129,6 +130,14 @@ export default function PostDetail({ params }: { params: Promise<{ slug: string 
                 ))}
               </div>
             </header>
+            <Separator className="mb-8" />
+            <Image
+              src={post.coverImage}
+              alt={post.coverImageAlt || "Cover Image"}
+              width={800}
+              height={400}
+              className="w-full h-auto rounded-lg mb-8"
+            />
 
             {/* Table of Contents - Mobile Only */}
             <div className="lg:hidden mb-8">
