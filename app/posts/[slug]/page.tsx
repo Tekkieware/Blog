@@ -8,7 +8,7 @@ import Link from "next/link";
 import { TableOfContents } from "@/components/table-of-content";
 import { MarkdownRenderer } from "@/components/markdown-renderer";
 import StickyBackButton from "@/components/sticky-back-button";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import PostDetailSkeleton from "@/components/post-detail-skeleton";
 
 const generateSlug = (text: string): string => {
@@ -37,13 +37,14 @@ const generateToc = (markdown: string) => {
 };
 
 export default function PostDetail({ params }: { params: { slug: string } }) {
+  const { slug } = React.use(params);
   const [post, setPost] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const res = await fetch(`/api/posts/slug/${params.slug}`);
+        const res = await fetch(`/api/posts/slug/${slug}`);
         const data = await res.json();
         setPost(data);
       } catch (error) {
@@ -54,7 +55,7 @@ export default function PostDetail({ params }: { params: { slug: string } }) {
     };
 
     fetchPost();
-  }, [params.slug]);
+  }, [slug]);
 
   if (loading) {
     return <PostDetailSkeleton />;
