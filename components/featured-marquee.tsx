@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useRef, useEffect } from "react"
@@ -7,55 +8,8 @@ import { ArrowRight, ArrowUpRight, Calendar, Pause, Play, Tag } from "lucide-rea
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui-tailwind/card"
-
-// Featured posts data
-const featuredPosts = [
-  {
-    id: "1",
-    title: "The Art of Component Composition",
-    excerpt: "How to build maintainable UI components that scale with your application",
-    date: "2023-05-15",
-    layer: "frontend",
-    tags: ["react", "architecture", "patterns"],
-    slug: "component-composition",
-  },
-  {
-    id: "2",
-    title: "API Design Principles for Backend Engineers",
-    excerpt: "Creating intuitive, consistent, and evolvable APIs that developers love",
-    date: "2023-06-22",
-    layer: "backend",
-    tags: ["api", "rest", "graphql"],
-    slug: "api-design-principles",
-  },
-  {
-    id: "3",
-    title: "Infrastructure as Code: Beyond the Basics",
-    excerpt: "Advanced patterns for managing cloud infrastructure with code",
-    date: "2023-07-10",
-    layer: "devops",
-    tags: ["terraform", "aws", "iac"],
-    slug: "infrastructure-as-code",
-  },
-  {
-    id: "4",
-    title: "System Design: Scaling to Your First Million Users",
-    excerpt: "Architectural patterns and considerations for high-scale applications",
-    date: "2023-08-05",
-    layer: "architecture",
-    tags: ["scaling", "distributed-systems", "performance"],
-    slug: "scaling-to-million-users",
-  },
-  {
-    id: "5",
-    title: "Building Engineering Teams That Last",
-    excerpt: "Strategies for creating a culture of growth, trust, and technical excellence",
-    date: "2023-09-18",
-    layer: "peopleware",
-    tags: ["leadership", "culture", "mentorship"],
-    slug: "building-engineering-teams",
-  },
-]
+import { getPosts } from "@/lib/services/postService"
+import { IPost } from "@/models/post"
 
 // Helper function to get color based on layer
 const getLayerColor = (layer: string) => {
@@ -80,9 +34,19 @@ const getLayerColor = (layer: string) => {
 export function FeaturedMarquee() {
   const [isPaused, setIsPaused] = useState(false)
   const marqueeRef = useRef<HTMLDivElement>(null)
+  const [posts, setPosts] = useState<IPost[]>([])
+
+  useEffect(() => {
+    async function fetchPosts() {
+      const fetchedPosts = await getPosts()
+      setPosts(fetchedPosts)
+    }
+
+    fetchPosts()
+  }, [])
 
   // Duplicate the posts for continuous scrolling
-  const allPosts = [...featuredPosts, ...featuredPosts]
+  const allPosts = posts.length > 0 ? [...posts, ...posts] : []
 
   // Add this function after the allPosts declaration
   const togglePause = () => {
@@ -109,7 +73,7 @@ export function FeaturedMarquee() {
 
         <div ref={marqueeRef} className={cn("flex gap-4 marquee-animation", isPaused && "marquee-paused")}>
           {allPosts.map((post, index) => (
-            <Link href={`/posts/${post.slug}`} key={`${post.id}-${index}`} className="shrink-0">
+            <Link href={`/posts/${post.slug}`} key={`${post._id}-${index}`} className="shrink-0">
               <Card
                 className={cn(
                   "w-[320px] h-[200px] overflow-hidden transition-all duration-200 group border-2",
@@ -130,7 +94,7 @@ export function FeaturedMarquee() {
                     </Badge>
                     <div className="flex items-center text-xs text-muted-foreground">
                       <Calendar className="h-3 w-3 mr-1" />
-                      {post.date}
+                      {new Date(post.createdAt).toLocaleDateString()}
                     </div>
                   </div>
                   <CardTitle className="font-mono text-lg group-hover:text-primary transition-colors line-clamp-1">
