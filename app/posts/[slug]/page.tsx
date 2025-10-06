@@ -12,6 +12,7 @@ import React, { useEffect, useState } from "react";
 import PostDetailSkeleton from "@/components/post-detail-skeleton";
 import { IPost } from "@/models/post";
 import Image from "next/image";
+import { readingTime } from 'reading-time-estimator'
 
 const generateSlug = (text: string): string => {
   return text
@@ -37,6 +38,22 @@ const generateToc = (markdown: string) => {
 
   return toc;
 };
+
+
+const enhancedReadingTime = (content: string) => {
+  const base = readingTime(content);
+  const imageCount = (content.match(/!\[.*?\]\(.*?\)/g) || []).length;
+  const codeBlockCount = (content.match(/```[\s\S]*?```/g) || []).length;
+
+  const extraSeconds = imageCount * 10 + codeBlockCount * 30;
+  const minutes = base.minutes + extraSeconds / 60;
+
+  return {
+    ...base,
+    text: `${Math.ceil(minutes)} min read`,
+  };
+};
+
 
 export default function PostDetail({ params }: { params: Promise<{ slug: string }> }) {
   const promiseParam = React.use(params);
@@ -71,6 +88,9 @@ export default function PostDetail({ params }: { params: Promise<{ slug: string 
 
   const tableOfContents = generateToc(post.content);
 
+  const time = enhancedReadingTime(post.content);
+  const postReadTime = time.text;
+
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
@@ -101,8 +121,7 @@ export default function PostDetail({ params }: { params: Promise<{ slug: string 
                 </div>
                 <div className="flex items-center text-muted-foreground">
                   <Clock className="mr-2 h-4 w-4" />
-                  {/* {post.readTime} */}
-                  read time
+                  {postReadTime}
                 </div>
                 <div className="flex items-center text-muted-foreground">
                   <User className="mr-2 h-4 w-4" />
