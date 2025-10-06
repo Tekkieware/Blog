@@ -7,64 +7,9 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { ArrowUpRight, Calendar } from "lucide-react"
-
-// Mock data for posts
-const posts = [
-  {
-    id: "1",
-    title: "The Art of Component Composition",
-    excerpt: "How to build maintainable UI components that scale with your application",
-    date: "2023-05-15",
-    layer: "frontend",
-    tags: ["react", "architecture", "patterns"],
-    slug: "component-composition",
-  },
-  {
-    id: "2",
-    title: "API Design Principles for Backend Engineers",
-    excerpt: "Creating intuitive, consistent, and evolvable APIs that developers love",
-    date: "2023-06-22",
-    layer: "backend",
-    tags: ["api", "rest", "graphql"],
-    slug: "api-design-principles",
-  },
-  {
-    id: "3",
-    title: "Infrastructure as Code: Beyond the Basics",
-    excerpt: "Advanced patterns for managing cloud infrastructure with code",
-    date: "2023-07-10",
-    layer: "devops",
-    tags: ["terraform", "aws", "iac"],
-    slug: "infrastructure-as-code",
-  },
-  {
-    id: "4",
-    title: "System Design: Scaling to Your First Million Users",
-    excerpt: "Architectural patterns and considerations for high-scale applications",
-    date: "2023-08-05",
-    layer: "architecture",
-    tags: ["scaling", "distributed-systems", "performance"],
-    slug: "scaling-to-million-users",
-  },
-  {
-    id: "5",
-    title: "Building Engineering Teams That Last",
-    excerpt: "Strategies for creating a culture of growth, trust, and technical excellence",
-    date: "2023-09-18",
-    layer: "peopleware",
-    tags: ["leadership", "culture", "mentorship"],
-    slug: "building-engineering-teams",
-  },
-  {
-    id: "6",
-    title: "Late Night Debugging: Tales from Production",
-    excerpt: "War stories and lessons learned from critical production incidents",
-    date: "2023-10-30",
-    layer: "overflow",
-    tags: ["debugging", "incidents", "lessons"],
-    slug: "late-night-debugging",
-  },
-]
+import { getPosts, getPostsByLayer } from "@/lib/services/postService"
+import { IPost } from "@/models/post"
+import { useEffect, useState } from "react"
 
 // Helper function to get color based on layer
 const getLayerColor = (layer: string) => {
@@ -91,14 +36,27 @@ interface PostListProps {
 }
 
 export function PostList({ activeLayer }: PostListProps) {
-  // Filter posts based on active layer
-  const filteredPosts = activeLayer === "all" ? posts : posts.filter((post) => post.layer === activeLayer)
+  const [posts, setPosts] = useState<IPost[]>([])
+
+  useEffect(() => {
+    async function fetchPosts() {
+      let fetchedPosts: IPost[]
+      if (activeLayer === "all") {
+        fetchedPosts = await getPosts()
+      } else {
+        fetchedPosts = await getPostsByLayer(activeLayer)
+      }
+      setPosts(fetchedPosts)
+    }
+
+    fetchPosts()
+  }, [activeLayer])
 
   return (
     <div className="space-y-6">
-      {filteredPosts.length > 0 ? (
-        filteredPosts.map((post) => (
-          <Link href={`/posts/${post.slug}`} key={post.id}>
+      {posts.length > 0 ? (
+        posts.map((post) => (
+          <Link href={`/posts/${post.slug}`} key={post._id}>
             <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
               <Card
                 className={cn(
@@ -122,7 +80,7 @@ export function PostList({ activeLayer }: PostListProps) {
                         </Badge>
                         <div className="flex items-center text-xs text-muted-foreground">
                           <Calendar className="h-3 w-3 mr-1" />
-                          {post.date}
+                          {new Date(post.createdAt).toLocaleDateString()}
                         </div>
                       </div>
                       <CardTitle className="font-mono text-xl group-hover:text-primary transition-colors">
