@@ -106,12 +106,12 @@ export function FeaturedMarquee() {
                       {new Date(post.createdAt).toLocaleDateString()}
                     </div>
                   </div>
-                  <CardTitle className="font-mono text-lg group-hover:text-primary transition-colors line-clamp-1">
+                  <CardTitle className="font-mono text-lg group-hover:text-primary transition-colors line-clamp-1 text-left">
                     {post.title}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground text-sm line-clamp-2">{post.excerpt}</p>
+                  <p className="text-muted-foreground text-sm line-clamp-2 text-left">{post.excerpt}</p>
                   <div className="flex flex-wrap gap-2 mt-4">
                     {post.tags.slice(0, 2).map((tag) => (
                       <Badge key={tag} variant="secondary" className="text-xs">
