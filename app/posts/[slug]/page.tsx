@@ -10,6 +10,7 @@ import { MarkdownRenderer } from "@/components/markdown-renderer";
 import StickyBackButton from "@/components/sticky-back-button";
 import React, { useEffect, useState } from "react";
 import PostDetailSkeleton from "@/components/post-detail-skeleton";
+import { IPost } from "@/models/post";
 
 const generateSlug = (text: string): string => {
   return text
@@ -40,7 +41,7 @@ export default function PostDetail({ params }: { params: Promise<{ slug: string 
   const promiseParam = React.use(params);
 
   const { slug } = promiseParam;
-  const [post, setPost] = useState<any>(null);
+  const [post, setPost] = useState<IPost | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -95,11 +96,12 @@ export default function PostDetail({ params }: { params: Promise<{ slug: string 
                 </Badge>
                 <div className="flex items-center text-muted-foreground">
                   <Calendar className="mr-2 h-4 w-4" />
-                  {new Date(post.date).toLocaleDateString()}
+                  {new Date(post.createdAt).toLocaleDateString()}
                 </div>
                 <div className="flex items-center text-muted-foreground">
                   <Clock className="mr-2 h-4 w-4" />
-                  {post.readTime}
+                  {/* {post.readTime} */}
+                  read time
                 </div>
                 <div className="flex items-center text-muted-foreground">
                   <User className="mr-2 h-4 w-4" />
