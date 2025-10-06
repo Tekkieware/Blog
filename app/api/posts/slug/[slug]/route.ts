@@ -2,10 +2,16 @@ import dbConnect from "@/lib/db";
 import Post from "@/models/post";
 import { NextResponse } from "next/server";
 
-export async function GET(request: Request, { params }: { params: { slug: string } }) {
+type RouteContext = {
+    params: Promise<{ slug: string }>;
+};
+
+export async function GET(request: Request, context: RouteContext) {
     await dbConnect();
     try {
-        const post = await Post.findOne({ slug: params.slug });
+        const { slug } = await context.params;
+
+        const post = await Post.findOne({ slug: slug });
         if (!post) {
             return NextResponse.json({ message: "Post not found" }, { status: 404 });
         }
