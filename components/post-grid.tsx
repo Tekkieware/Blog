@@ -12,6 +12,8 @@ import { getPosts, getPostsByLayer } from "@/lib/services/postService"
 import { IPost } from "@/models/post"
 import { useEffect, useState } from "react"
 
+import { PostCardSkeleton } from "./post-card-skeleton"
+
 const getLayerColor = (layer: string) => {
   switch (layer) {
     case "frontend":
@@ -37,9 +39,11 @@ interface PostGridProps {
 
 export function PostGrid({ activeLayer }: PostGridProps) {
   const [posts, setPosts] = useState<IPost[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function fetchPosts() {
+      setLoading(true)
       let fetchedPosts: IPost[]
       if (activeLayer === "all") {
         fetchedPosts = await getPosts()
@@ -47,6 +51,7 @@ export function PostGrid({ activeLayer }: PostGridProps) {
         fetchedPosts = await getPostsByLayer(activeLayer)
       }
       setPosts(fetchedPosts)
+      setLoading(false)
     }
 
     fetchPosts()
@@ -63,6 +68,16 @@ export function PostGrid({ activeLayer }: PostGridProps) {
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  }
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <PostCardSkeleton key={i} />
+        ))}
+      </div>
+    )
   }
 
   return (

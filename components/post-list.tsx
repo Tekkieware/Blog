@@ -11,6 +11,8 @@ import { getPosts, getPostsByLayer } from "@/lib/services/postService"
 import { IPost } from "@/models/post"
 import { useEffect, useState } from "react"
 
+import { PostCardSkeleton } from "./post-card-skeleton"
+
 // Helper function to get color based on layer
 const getLayerColor = (layer: string) => {
   switch (layer) {
@@ -37,9 +39,11 @@ interface PostListProps {
 
 export function PostList({ activeLayer }: PostListProps) {
   const [posts, setPosts] = useState<IPost[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function fetchPosts() {
+      setLoading(true)
       let fetchedPosts: IPost[]
       if (activeLayer === "all") {
         fetchedPosts = await getPosts()
@@ -47,10 +51,21 @@ export function PostList({ activeLayer }: PostListProps) {
         fetchedPosts = await getPostsByLayer(activeLayer)
       }
       setPosts(fetchedPosts)
+      setLoading(false)
     }
 
     fetchPosts()
   }, [activeLayer])
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <PostCardSkeleton key={i} />
+        ))}
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
