@@ -36,8 +36,10 @@ const generateToc = (markdown: string) => {
   return toc;
 };
 
-export default function PostDetail({ params }: { params: { slug: string } }) {
-  const { slug } = React.use(params);
+export default function PostDetail({ params }: { params: Promise<{ slug: string }> }) {
+  const promiseParam = React.use(params);
+
+  const { slug } = promiseParam;
   const [post, setPost] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
