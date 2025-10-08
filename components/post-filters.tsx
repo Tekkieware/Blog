@@ -8,12 +8,14 @@ import { motion } from "framer-motion"
 import { useRouter, usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { layers } from "@/components/layer-navigator"
+import { IPost } from "@/models/post"
 
 interface PostFiltersProps {
   activeLayer: string
   setActiveLayer: (layer: string) => void
   viewMode: "grid" | "list"
   setViewMode: (mode: "grid" | "list") => void
+  posts: IPost[]
 }
 
 export function PostFilters({
@@ -21,6 +23,7 @@ export function PostFilters({
   setActiveLayer,
   viewMode,
   setViewMode,
+  posts
 }: PostFiltersProps) {
   const router = useRouter()
   const pathname = usePathname()
@@ -104,7 +107,7 @@ export function PostFilters({
                     activeLayer !== "all" && "bg-white/20"
                   )}
                 >
-                  10
+                  {posts?.length}
                 </Badge>
               </Button>
             </motion.div>
@@ -137,7 +140,7 @@ export function PostFilters({
                         activeLayer !== layer.slug && "bg-white/20"
                       )}
                     >
-                      {layer.count}
+                      {posts.filter(post => post.layer === layer.slug).length}
                     </Badge>
                   )}
                 </Button>
