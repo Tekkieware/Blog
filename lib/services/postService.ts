@@ -1,10 +1,22 @@
 
 import { IPost } from "@/models/post";
 
-export async function getPosts(): Promise<IPost[]> {
-    const response = await fetch("/api/posts");
+export async function getPosts(page: number = 1, limit: number = 10): Promise<IPost[]> {
+    const response = await fetch(`/api/posts?page=${page}&limit=${limit}`);
     if (!response.ok) {
         throw new Error("Failed to fetch posts");
+    }
+    return response.json();
+}
+
+export async function getPostsAndCount(page: number = 1, limit: number = 10, layer?: string): Promise<{ posts: IPost[], total: number }> {
+    let url = `/api/posts?page=${page}&limit=${limit}&includeCount=true`;
+    if (layer && layer !== 'all') {
+        url += `&layer=${layer}`;
+    }
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error("Failed to fetch posts and count");
     }
     return response.json();
 }

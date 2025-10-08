@@ -2,20 +2,19 @@
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Search, LayoutGrid, List, Filter } from "lucide-react"
+import { Search, LayoutGrid, List } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { motion } from "framer-motion"
-import { useRouter, usePathname } from "next/navigation"
+import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { layers } from "@/components/layer-navigator"
-import { IPost } from "@/models/post"
+import { useEffect, useState } from "react"
 
 interface PostFiltersProps {
   activeLayer: string
   setActiveLayer: (layer: string) => void
   viewMode: "grid" | "list"
   setViewMode: (mode: "grid" | "list") => void
-  posts: IPost[]
 }
 
 export function PostFilters({
@@ -23,20 +22,33 @@ export function PostFilters({
   setActiveLayer,
   viewMode,
   setViewMode,
-  posts
 }: PostFiltersProps) {
   const router = useRouter()
   const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const [layerCounts, setLayerCounts] = useState<{ [key: string]: number }>({})
+
+  useEffect(() => {
+    async function fetchLayerCounts() {
+      const response = await fetch("/api/posts/layer/count")
+      if (response.ok) {
+        const counts = await response.json()
+        setLayerCounts(counts)
+      }
+    }
+    fetchLayerCounts()
+  }, [])
 
   // Handle layer button click
   const handleLayerChange = (layerId: string) => {
     setActiveLayer(layerId)
-
+    const params = new URLSearchParams(searchParams)
     if (layerId === "all") {
-      router.push(pathname)
+      params.delete("layer")
     } else {
-      router.push(`${pathname}?layer=${layerId}`)
+      params.set("layer", layerId)
     }
+    router.push(`${pathname}?${params.toString()}`)
   }
 
   return (
@@ -107,7 +119,7 @@ export function PostFilters({
                     activeLayer !== "all" && "bg-white/20"
                   )}
                 >
-                  {posts?.length}
+                  {layerCounts.all || 0}
                 </Badge>
               </Button>
             </motion.div>
@@ -140,7 +152,7 @@ export function PostFilters({
                         activeLayer !== layer.slug && "bg-white/20"
                       )}
                     >
-                      {posts.filter(post => post.layer === layer.slug).length}
+                      {layerCounts[layer.slug] || 0}
                     </Badge>
                   )}
                 </Button>

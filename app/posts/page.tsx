@@ -6,17 +6,28 @@ import { useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { PostList } from "@/components/post-list"
 import { IPost } from "@/models/post"
-import { getPosts } from "@/lib/services/postService"
+import { getPostsAndCount } from "@/lib/services/postService"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
 
 export default function PostsPage() {
   const searchParams = useSearchParams()
   const layerParam = searchParams.get("layer")
+  const pageParam = searchParams.get("page")
   const [activeLayer, setActiveLayer] = useState<string>(layerParam || "all")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [loading, setLoading] = useState(true)
   const [posts, setPosts] = useState<IPost[]>([])
+  const [page, setPage] = useState(pageParam ? parseInt(pageParam) : 1)
+  const [totalPages, setTotalPages] = useState(1)
 
-  // Update active layer when URL parameter changes
   useEffect(() => {
     if (layerParam) {
       setActiveLayer(layerParam)
@@ -24,14 +35,20 @@ export default function PostsPage() {
 
     async function fetchPosts() {
       setLoading(true)
-      const fetchedPosts = await getPosts()
+      const { posts: fetchedPosts, total } = await getPostsAndCount(page, 1, activeLayer)
       setPosts(fetchedPosts)
+      setTotalPages(Math.ceil(total / 1))
       setLoading(false)
     }
 
     fetchPosts()
-  }, [])
+  }, [page, layerParam])
 
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage)
+    // Update URL to reflect the new page
+    window.history.pushState(null, '', `?page=${newPage}${layerParam ? `&layer=${layerParam}` : ''}`)
+  }
 
   return (
     <div className="container py-8">
@@ -50,7 +67,6 @@ export default function PostsPage() {
           setActiveLayer={setActiveLayer}
           viewMode={viewMode}
           setViewMode={setViewMode}
-          posts={posts}
         />
 
         {viewMode === "grid" ? (
@@ -58,6 +74,43 @@ export default function PostsPage() {
         ) : (
           <PostList loading={loading} activeLayer={activeLayer} posts={posts} />
         )}
+
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault()
+                  handlePageChange(Math.max(1, page - 1))
+                }}
+              />
+            </PaginationItem>
+            {[...Array(totalPages)].map((_, i) => (
+              <PaginationItem key={i}>
+                <PaginationLink
+                  href="#"
+                  isActive={page === i + 1}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    handlePageChange(i + 1)
+                  }}
+                >
+                  {i + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            <PaginationItem>
+              <PaginationNext
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault()
+                  handlePageChange(Math.min(totalPages, page + 1))
+                }}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
       </div>
     </div>
   )

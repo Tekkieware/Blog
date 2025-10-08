@@ -3,10 +3,29 @@ import dbConnect from "@/lib/db";
 import Post from "@/models/post";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
     await dbConnect();
     try {
-        const posts = await Post.find({}).sort({ createdAt: -1 });
+        const url = new URL(request.url);
+        const page = parseInt(url.searchParams.get("page") || "1");
+        const limit = parseInt(url.searchParams.get("limit") || "10");
+        const includeCount = url.searchParams.get("includeCount") === "true";
+        const layer = url.searchParams.get("layer");
+
+        const skip = (page - 1) * limit;
+
+        let query = {};
+        if (layer && layer !== 'all') {
+            query = { layer };
+        }
+
+        const posts = await Post.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit);
+
+        if (includeCount) {
+            const total = await Post.countDocuments(query);
+            return NextResponse.json({ posts, total }, { status: 200 });
+        }
+
         return NextResponse.json(posts, { status: 200 });
     } catch (error) {
         return NextResponse.json({ message: "Failed to fetch posts" }, { status: 500 });
