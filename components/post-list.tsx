@@ -35,27 +35,11 @@ const getLayerColor = (layer: string) => {
 
 interface PostListProps {
   activeLayer: string
+  posts: IPost[]
+  loading: boolean
 }
 
-export function PostList({ activeLayer }: PostListProps) {
-  const [posts, setPosts] = useState<IPost[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    async function fetchPosts() {
-      setLoading(true)
-      let fetchedPosts: IPost[]
-      if (activeLayer === "all") {
-        fetchedPosts = await getPosts()
-      } else {
-        fetchedPosts = await getPostsByLayer(activeLayer)
-      }
-      setPosts(fetchedPosts)
-      setLoading(false)
-    }
-
-    fetchPosts()
-  }, [activeLayer])
+export function PostList({ activeLayer, posts, loading }: PostListProps) {
 
   if (loading) {
     return (
@@ -67,10 +51,12 @@ export function PostList({ activeLayer }: PostListProps) {
     )
   }
 
+  const filteredPosts = activeLayer === "all" ? posts : posts.filter(post => post.layer === activeLayer);
+
   return (
     <div className="space-y-6">
-      {posts.length > 0 ? (
-        posts.map((post) => (
+      {filteredPosts.length > 0 ? (
+        filteredPosts.map((post) => (
           <Link href={`/posts/${post.slug}`} key={post._id}>
             <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
               <Card

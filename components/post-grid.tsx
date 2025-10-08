@@ -35,27 +35,11 @@ const getLayerColor = (layer: string) => {
 
 interface PostGridProps {
   activeLayer: string
+  posts: IPost[]
+  loading: boolean
 }
 
-export function PostGrid({ activeLayer }: PostGridProps) {
-  const [posts, setPosts] = useState<IPost[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    async function fetchPosts() {
-      setLoading(true)
-      let fetchedPosts: IPost[]
-      if (activeLayer === "all") {
-        fetchedPosts = await getPosts()
-      } else {
-        fetchedPosts = await getPostsByLayer(activeLayer)
-      }
-      setPosts(fetchedPosts)
-      setLoading(false)
-    }
-
-    fetchPosts()
-  }, [activeLayer])
+export function PostGrid({ activeLayer, posts, loading }: PostGridProps) {
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -80,6 +64,8 @@ export function PostGrid({ activeLayer }: PostGridProps) {
     )
   }
 
+  const filteredPosts = activeLayer === "all" ? posts : posts.filter(post => post.layer === activeLayer);
+
   return (
     <motion.div
       variants={containerVariants}
@@ -87,8 +73,8 @@ export function PostGrid({ activeLayer }: PostGridProps) {
       animate="visible"
       className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
     >
-      {posts.length > 0 ? (
-        posts.map((post) => (
+      {filteredPosts.length > 0 ? (
+        filteredPosts.map((post) => (
           <Link href={`/posts/${post.slug}`} key={post._id} className="h-full">
             <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }} className="h-full">
               <Card

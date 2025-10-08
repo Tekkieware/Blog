@@ -5,19 +5,33 @@ import { PostFilters } from "@/components/post-filters"
 import { useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { PostList } from "@/components/post-list"
+import { IPost } from "@/models/post"
+import { getPosts } from "@/lib/services/postService"
 
 export default function PostsPage() {
   const searchParams = useSearchParams()
   const layerParam = searchParams.get("layer")
   const [activeLayer, setActiveLayer] = useState<string>(layerParam || "all")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
+  const [loading, setLoading] = useState(true)
+  const [posts, setPosts] = useState<IPost[]>([])
 
   // Update active layer when URL parameter changes
   useEffect(() => {
     if (layerParam) {
       setActiveLayer(layerParam)
     }
-  }, [layerParam])
+
+    async function fetchPosts() {
+      setLoading(true)
+      const fetchedPosts = await getPosts()
+      setPosts(fetchedPosts)
+      setLoading(false)
+    }
+
+    fetchPosts()
+  }, [])
+
 
   return (
     <div className="container py-8">
@@ -36,12 +50,13 @@ export default function PostsPage() {
           setActiveLayer={setActiveLayer}
           viewMode={viewMode}
           setViewMode={setViewMode}
+          posts={posts}
         />
 
         {viewMode === "grid" ? (
-          <PostGrid activeLayer={activeLayer} />
+          <PostGrid loading={loading} activeLayer={activeLayer} posts={posts} />
         ) : (
-          <PostList activeLayer={activeLayer} />
+          <PostList loading={loading} activeLayer={activeLayer} posts={posts} />
         )}
       </div>
     </div>
