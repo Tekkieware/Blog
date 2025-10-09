@@ -12,7 +12,7 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from "@/components/ui-tailwind/command"
+} from "@/components/ui/command"
 
 export default function CommandPalette() {
   const [open, setOpen] = useState(false)
@@ -161,19 +161,18 @@ export default function CommandPalette() {
             <Tag className="mr-2 h-4 w-4" />
             <span>Architecture</span>
           </CommandItem>
-
-          <CommandSeparator />
-          <CommandGroup heading="Actions">
-            <CommandItem
-              onSelect={() => {
-                router.push("/subscribe") // 👈 internal page
-                setOpen(false)
-              }}
-            >
-              <Mail className="mr-2 h-4 w-4" />
-              <span>Subscribe to Newsletter</span>
-            </CommandItem>
-          </CommandGroup>
+        </CommandGroup>
+        <CommandSeparator />
+        <CommandGroup heading="Actions">
+          <CommandItem
+            onSelect={() => {
+              router.push("/subscribe") // 👈 internal page
+              setOpen(false)
+            }}
+          >
+            <Mail className="mr-2 h-4 w-4" />
+            <span>Subscribe to Newsletter</span>
+          </CommandItem>
         </CommandGroup>
       </CommandList>
     </CommandDialog>
