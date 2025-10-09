@@ -11,12 +11,21 @@ export async function GET(request: NextRequest) {
         const limit = parseInt(url.searchParams.get("limit") || "10");
         const includeCount = url.searchParams.get("includeCount") === "true";
         const layer = url.searchParams.get("layer");
+        const searchTerm = url.searchParams.get("searchTerm");
 
         const skip = (page - 1) * limit;
 
-        let query = {};
+        let query: any = {};
         if (layer && layer !== 'all') {
-            query = { layer };
+            query.layer = layer;
+        }
+
+        if (searchTerm) {
+            query.$or = [
+                { title: { $regex: searchTerm, $options: "i" } },
+                { excerpt: { $regex: searchTerm, $options: "i" } },
+                { layer: { $regex: searchTerm, $options: "i" } },
+            ];
         }
 
         const posts = await Post.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit);
