@@ -28,6 +28,19 @@ export default function PostsPage() {
   const [posts, setPosts] = useState<IPost[]>([])
   const [page, setPage] = useState(pageParam ? parseInt(pageParam) : 1)
   const [totalPages, setTotalPages] = useState(1)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const POSTS_PER_PAGE = 10;
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500); // 500ms debounce
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchTerm]);
 
   useEffect(() => {
     if (layerParam) {
@@ -36,19 +49,24 @@ export default function PostsPage() {
 
     async function fetchPosts() {
       setLoading(true)
-      const { posts: fetchedPosts, total } = await getPostsAndCount(page, 1, activeLayer)
+      const { posts: fetchedPosts, total } = await getPostsAndCount(page, POSTS_PER_PAGE, activeLayer, debouncedSearchTerm)
       setPosts(fetchedPosts)
-      setTotalPages(Math.ceil(total / 1))
+      setTotalPages(Math.ceil(total / POSTS_PER_PAGE))
       setLoading(false)
     }
 
     fetchPosts()
-  }, [page, layerParam])
+  }, [page, layerParam, debouncedSearchTerm])
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage)
     // Update URL to reflect the new page
     window.history.pushState(null, '', `?page=${newPage}${layerParam ? `&layer=${layerParam}` : ''}`)
+  }
+
+  const handleSearchChange = (term: string) => {
+    setSearchTerm(term);
+    setPage(1); // Reset to first page on new search
   }
 
   return (
@@ -68,6 +86,8 @@ export default function PostsPage() {
           setActiveLayer={setActiveLayer}
           viewMode={viewMode}
           setViewMode={setViewMode}
+          searchTerm={searchTerm}
+          onSearchChange={handleSearchChange}
         />
 
         {viewMode === "grid" ? (

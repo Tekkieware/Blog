@@ -1,18 +1,25 @@
 
 import { IPost } from "@/models/post";
 
-export async function getPosts(page: number = 1, limit: number = 10): Promise<IPost[]> {
-    const response = await fetch(`/api/posts?page=${page}&limit=${limit}`);
+export async function getPosts(page: number = 1, limit: number = 10, searchTerm?: string): Promise<IPost[]> {
+    let url = `/api/posts?page=${page}&limit=${limit}`;
+    if (searchTerm) {
+        url += `&searchTerm=${searchTerm}`;
+    }
+    const response = await fetch(url);
     if (!response.ok) {
         throw new Error("Failed to fetch posts");
     }
     return response.json();
 }
 
-export async function getPostsAndCount(page: number = 1, limit: number = 10, layer?: string): Promise<{ posts: IPost[], total: number }> {
+export async function getPostsAndCount(page: number = 1, limit: number = 10, layer?: string, searchTerm?: string): Promise<{ posts: IPost[], total: number }> {
     let url = `/api/posts?page=${page}&limit=${limit}&includeCount=true`;
     if (layer && layer !== 'all') {
         url += `&layer=${layer}`;
+    }
+    if (searchTerm) {
+        url += `&searchTerm=${searchTerm}`;
     }
     const response = await fetch(url);
     if (!response.ok) {

@@ -19,9 +19,9 @@ export default function AdminPage() {
   const router = useRouter()
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const fetchedPosts = await getPosts();
+            const fetchPosts = async () => {
+              console.log("Fetching posts with searchTerm:", searchTerm);
+              try {        const fetchedPosts = await getPosts(1, 10, searchTerm); // Pass searchTerm to getPosts
         setPosts(fetchedPosts);
       } catch (error) {
         toast.error("Failed to fetch posts.");
@@ -31,7 +31,7 @@ export default function AdminPage() {
     };
 
     fetchPosts();
-  }, []);
+  }, [searchTerm]); // Add searchTerm as a dependency
 
   const handleDelete = async (id: string) => {
     if (confirm("Are you sure you want to delete this post?")) {
@@ -51,12 +51,7 @@ export default function AdminPage() {
     router.push("/login")
   }
 
-  const filteredPosts = posts.filter(
-    (post) =>
-      post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      post.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      post.layer.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+  const filteredPosts = posts;
 
   if (loading) {
     return <div>Loading...</div>;
