@@ -6,15 +6,17 @@ import { Search, LayoutGrid, List } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { motion } from "framer-motion"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
-import { cn } from "@/lib/utils"
+import { cn, debounce } from "@/lib/utils"
 import { layers } from "@/components/layer-navigator"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 
 interface PostFiltersProps {
   activeLayer: string
   setActiveLayer: (layer: string) => void
   viewMode: "grid" | "list"
   setViewMode: (mode: "grid" | "list") => void
+  searchTerm: string;
+  onSearchChange: (term: string) => void;
 }
 
 export function PostFilters({
@@ -22,11 +24,18 @@ export function PostFilters({
   setActiveLayer,
   viewMode,
   setViewMode,
+  searchTerm,
+  onSearchChange,
 }: PostFiltersProps) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const [layerCounts, setLayerCounts] = useState<{ [key: string]: number }>({})
+  const [inputValue, setInputValue] = useState(searchTerm);
+
+  useEffect(() => {
+    setInputValue(searchTerm);
+  }, [searchTerm]);
 
   useEffect(() => {
     async function fetchLayerCounts() {
@@ -38,6 +47,15 @@ export function PostFilters({
     }
     fetchLayerCounts()
   }, [])
+
+  const debouncedSearch = useCallback(
+    debounce((term: string) => {
+      if (term.length >= 3 || term.length === 0) {
+        onSearchChange(term);
+      }
+    }, 500),
+    [onSearchChange]
+  );
 
   // Handle layer button click
   const handleLayerChange = (layerId: string) => {
@@ -51,6 +69,22 @@ export function PostFilters({
     router.push(`${pathname}?${params.toString()}`)
   }
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const term = e.target.value;
+    setInputValue(term);
+    debouncedSearch(term);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault(); // Prevent form submission if it's part of a form
+      if (inputValue.length >= 3) {
+        debouncedSearch.cancel(); // Cancel any pending debounced calls
+        onSearchChange(inputValue);
+      }
+    }
+  };
+
   return (
     <div className="flex flex-col gap-6 items-center">
       {/* Search bar */}
@@ -62,6 +96,9 @@ export function PostFilters({
             type="search"
             placeholder="Search posts..."
             className="w-full md:w-xl pl-8 bg-background"
+            value={inputValue}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
           />
         </div>
         <div className="items-center border rounded-md hidden md:flex">
