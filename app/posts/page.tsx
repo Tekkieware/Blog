@@ -16,6 +16,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
+import { PaginationLoader } from "@/components/ui/pagination-loader"
 
 export default function PostsPage() {
   const searchParams = useSearchParams()
@@ -75,42 +76,46 @@ export default function PostsPage() {
           <PostList loading={loading} activeLayer={activeLayer} posts={posts} />
         )}
 
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault()
-                  handlePageChange(Math.max(1, page - 1))
-                }}
-              />
-            </PaginationItem>
-            {[...Array(totalPages)].map((_, i) => (
-              <PaginationItem key={i}>
-                <PaginationLink
+        {loading ? (
+          <PaginationLoader />
+        ) : (
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
                   href="#"
-                  isActive={page === i + 1}
                   onClick={(e) => {
                     e.preventDefault()
-                    handlePageChange(i + 1)
+                    handlePageChange(Math.max(1, page - 1))
                   }}
-                >
-                  {i + 1}
-                </PaginationLink>
+                />
               </PaginationItem>
-            ))}
-            <PaginationItem>
-              <PaginationNext
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault()
-                  handlePageChange(Math.min(totalPages, page + 1))
-                }}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+              {[...Array(totalPages)].map((_, i) => (
+                <PaginationItem key={i}>
+                  <PaginationLink
+                    href="#"
+                    isActive={page === i + 1}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      handlePageChange(i + 1)
+                    }}
+                  >
+                    {i + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              <PaginationItem>
+                <PaginationNext
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    handlePageChange(Math.min(totalPages, page + 1))
+                  }}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        )}
       </div>
     </div>
   )
