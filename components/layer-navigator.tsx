@@ -27,8 +27,8 @@ export const layers: Layer[] = [
     description: "UI architecture, component design, and user experience patterns",
     color: "indigo",
     slug: "frontend",
-    icon: "🎨",
-    count: 0, // Initial count
+    icon: "💻", // Clean & universal for UI work
+    count: 0,
   },
   {
     id: "02",
@@ -36,8 +36,8 @@ export const layers: Layer[] = [
     description: "API design, data modeling, and server-side architecture",
     color: "cyan",
     slug: "backend",
-    icon: "⚙️",
-    count: 0, // Initial count
+    icon: "🧠", // Symbolic of logic, processing, intelligence
+    count: 0,
   },
   {
     id: "03",
@@ -45,8 +45,8 @@ export const layers: Layer[] = [
     description: "CI/CD, infrastructure, and deployment strategies",
     color: "orange",
     slug: "devops",
-    icon: "🚀",
-    count: 0, // Initial count
+    icon: "⚡", // Energy, automation, pipelines
+    count: 0,
   },
   {
     id: "04",
@@ -54,8 +54,8 @@ export const layers: Layer[] = [
     description: "System design, scalability patterns, and technical decisions",
     color: "blue",
     slug: "architecture",
-    icon: "🏗️",
-    count: 0, // Initial count
+    icon: "🧱", // Structural, foundational
+    count: 0,
   },
   {
     id: "05",
@@ -63,10 +63,11 @@ export const layers: Layer[] = [
     description: "Team dynamics, mentorship, and engineering culture",
     color: "emerald",
     slug: "peopleware",
-    icon: "👥",
-    count: 0, // Initial count
-  }
+    icon: "🤝", // Collaboration, teamwork
+    count: 0,
+  },
 ]
+
 
 // Helper function to get color based on layer
 export const getLayerColor = (color: string) => {
