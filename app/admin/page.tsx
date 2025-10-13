@@ -91,7 +91,6 @@ export default function AdminPage() {
           <div className="flex items-center">
             <Link href="/" className="mr-6 flex items-center space-x-2">
               <ArrowLeft className="h-5 w-5 text-primary" />
-              <span className="font-mono font-bold">stacked</span>
             </Link>
             <h1 className="text-xl font-bold font-mono">Admin Dashboard</h1>
           </div>
