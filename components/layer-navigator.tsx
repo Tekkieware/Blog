@@ -5,7 +5,6 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import { ArrowRight } from "lucide-react"
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui-tailwind/card"
-import { count } from "console"
 
 // Export layers data so it can be used in other components
 export const layers = [
