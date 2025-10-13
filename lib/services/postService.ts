@@ -89,3 +89,11 @@ export async function deletePost(id: string): Promise<{ message: string }> {
     }
     return response.json();
 }
+
+export async function getLayerCounts(): Promise<{ [key: string]: number }> {
+    const response = await fetch(`/api/posts/layer/count`);
+    if (!response.ok) {
+        throw new Error("Failed to fetch layer counts");
+    }
+    return response.json();
+}

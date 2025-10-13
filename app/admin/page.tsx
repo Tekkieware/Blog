@@ -4,11 +4,19 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Plus, Search, Edit, Trash2, ArrowLeft, LogOut } from "lucide-react"
 import { Button } from "@/components/ui-tailwind/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui-tailwind/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationPrevious,
+  PaginationLink,
+  PaginationNext,
+} from "@/components/ui/pagination";
 import { Badge } from "@/components/ui-tailwind/badge"
 import { deleteCookie } from "cookies-next"
 import Link from "next/link"
-import { getPosts, deletePost } from "@/lib/services/postService";
+import { getPostsAndCount, deletePost, getLayerCounts } from "@/lib/services/postService";
 import { IPost } from "@/models/post";
 import { toast } from "sonner";
 
@@ -16,13 +24,31 @@ export default function AdminPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [posts, setPosts] = useState<IPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [layerCounts, setLayerCounts] = useState<{ [key: string]: number }>({});
   const router = useRouter()
 
   useEffect(() => {
-            const fetchPosts = async () => {
-              console.log("Fetching posts with searchTerm:", searchTerm);
-              try {        const fetchedPosts = await getPosts(1, 10, searchTerm); // Pass searchTerm to getPosts
+    const fetchLayerCounts = async () => {
+      try {
+        const counts = await getLayerCounts();
+        setLayerCounts(counts);
+      } catch (error) {
+        toast.error("Failed to fetch layer counts.");
+      }
+    };
+
+    fetchLayerCounts();
+  }, []);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      console.log("Fetching posts with searchTerm:", searchTerm);
+      try {
+        const { posts: fetchedPosts, total } = await getPostsAndCount(currentPage, 10, 'all', searchTerm);
         setPosts(fetchedPosts);
+        setTotalPages(Math.ceil(total / 10));
       } catch (error) {
         toast.error("Failed to fetch posts.");
       } finally {
@@ -31,18 +57,18 @@ export default function AdminPage() {
     };
 
     fetchPosts();
-  }, [searchTerm]); // Add searchTerm as a dependency
+  }, [searchTerm, currentPage]);
 
   const handleDelete = async (id: string) => {
     if (confirm("Are you sure you want to delete this post?")) {
-        const toastId = toast.loading("Deleting post...");
-        try {
-          await deletePost(id);
-          setPosts(posts.filter((post) => post._id !== id));
-          toast.success("Post deleted successfully!", { id: toastId });
-        } catch (error) {
-          toast.error("Failed to delete post.", { id: toastId });
-        }
+      const toastId = toast.loading("Deleting post...");
+      try {
+        await deletePost(id);
+        setPosts(posts.filter((post) => post._id !== id));
+        toast.success("Post deleted successfully!", { id: toastId });
+      } catch (error) {
+        toast.error("Failed to delete post.", { id: toastId });
+      }
     }
   };
 
@@ -176,12 +202,40 @@ export default function AdminPage() {
             </CardContent>
           </Card>
 
+          {totalPages > 1 && (
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setCurrentPage((prev) => Math.max(prev - 1, 1));
+                    }}
+                  />
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationLink href="#">{currentPage}</PaginationLink>
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationNext
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+                    }}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          )}
+
           {/* Stats Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {["frontend", "backend", "devops", "architecture"].map((layer) => {
-              const count = posts.filter((post) => post.layer === layer).length
+              const count = layerCounts[layer] || 0;
               const color =
-                layer === "frontend" ? "indigo" : layer === "backend" ? "cyan" : layer === "devops" ? "orange" : "blue"
+                layer === "frontend" ? "indigo" : layer === "backend" ? "cyan" : layer === "devops" ? "orange" : "blue";
 
               return (
                 <Card key={layer} className={`border-${color}-400/30 bg-${color}-400/5`}>
@@ -193,7 +247,7 @@ export default function AdminPage() {
                     <p className="text-xs text-muted-foreground">posts</p>
                   </CardContent>
                 </Card>
-              )
+              );
             })}
           </div>
         </div>
