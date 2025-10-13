@@ -37,28 +37,38 @@ export default function AboutPage() {
 
               {/* Social Links */}
               <div className="flex gap-2 mt-4">
-                <Button variant="outline" size="icon" className="rounded-full border-primary/20 hover:bg-primary/10">
-                  <Twitter className="h-4 w-4 text-[#1DA1F2]" />
-                  <span className="sr-only">Twitter</span>
-                </Button>
-                <Button variant="outline" size="icon" className="rounded-full border-primary/20 hover:bg-primary/10">
-                  <Linkedin className="h-4 w-4 text-[#0A66C2]" />
-                  <span className="sr-only">LinkedIn</span>
-                </Button>
-                <Button variant="outline" size="icon" className="rounded-full border-primary/20 hover:bg-primary/10">
-                  <Github className="h-4 w-4" />
-                  <span className="sr-only">GitHub</span>
-                </Button>
-                <Button variant="outline" size="icon" className="rounded-full border-primary/20 hover:bg-primary/10">
-                  <Globe className="h-4 w-4 text-[#10B981]" />
-                  <span className="sr-only">Website</span>
-                </Button>
+                <a href="" target="_blank">
+                  <Button variant="outline" size="icon" className="rounded-full border-primary/20 hover:bg-primary/10">
+                    <Twitter className="h-4 w-4 text-[#1DA1F2]" />
+                    <span className="sr-only">Twitter</span>
+                  </Button>
+                </a>
+                <a href="https://www.linkedin.com/in/isaiah-ozadhe/" target="_blank">
+                  <Button variant="outline" size="icon" className="rounded-full border-primary/20 hover:bg-primary/10">
+                    <Linkedin className="h-4 w-4 text-[#0A66C2]" />
+                    <span className="sr-only">LinkedIn</span>
+                  </Button>
+                </a>
+                <a href="https://github.com/Tekkieware" target="_blank">
+                  <Button variant="outline" size="icon" className="rounded-full border-primary/20 hover:bg-primary/10">
+                    <Github className="h-4 w-4" />
+                    <span className="sr-only">GitHub</span>
+                  </Button>
+                </a>
+                <a href="https://isaiahozadhe.tech" target="_blank">
+                  <Button variant="outline" size="icon" className="rounded-full border-primary/20 hover:bg-primary/10">
+                    <Globe className="h-4 w-4 text-[#10B981]" />
+                    <span className="sr-only">Website</span>
+                  </Button>
+                </a>
               </div>
 
-              <Button variant="outline" className="mt-2 w-full border-primary/20 hover:bg-primary/10">
-                <Mail className="h-4 w-4 mr-2" />
-                Contact
-              </Button>
+              <a href="https://isaiahozadhe.tech/#contact" target="_blank">
+                <Button variant="outline" className="mt-2 w-full border-primary/20 hover:bg-primary/10">
+                  <Mail className="h-4 w-4 mr-2" />
+                  Contact
+                </Button>
+              </a>
             </div>
 
             {/* Content Column */}
@@ -187,7 +197,7 @@ export default function AboutPage() {
               size="lg"
               className="border-primary/20 hover:bg-primary/10 hover:border-primary/30"
             >
-              <Link href="mailto:contact@example.com">Get in Touch</Link>
+              <Link href="https://isaiahozadhe.tech/#contact" target="_blank">Get in Touch</Link>
             </Button>
           </div>
         </div>
