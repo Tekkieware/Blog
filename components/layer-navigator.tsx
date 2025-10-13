@@ -81,16 +81,16 @@ export function LayerNavigator() {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {layers.map((layer) => (
         <Link href={`/posts?layer=${layer.slug}`} key={layer.id}>
-          <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
+          <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }} className="h-full">
             <Card
               className={cn(
-                "h-full overflow-hidden transition-all duration-200 border-2",
+                "h-full overflow-hidden transition-all duration-200 border-2 flex flex-col min-h-[200px]",
                 "bg-gradient-to-br",
                 getLayerColor(layer.color),
                 "hover:shadow-lg dark:hover:shadow-[0_0_15px_rgba(0,240,255,0.15)]",
               )}
             >
-              <CardHeader>
+              <CardHeader className="flex-1">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <span className="text-2xl mr-2">{layer.icon}</span>
@@ -100,10 +100,13 @@ export function LayerNavigator() {
                     [{layer.id}]
                   </span>
                 </div>
-                <CardDescription className="mt-2">{layer.description}</CardDescription>
+                <CardDescription className="mt-2 flex-1">{layer.description}</CardDescription>
               </CardHeader>
-              <CardFooter className="pt-0">
+              <CardFooter className="pt-0 mt-auto">
                 <div className="flex items-center text-sm font-medium text-primary group">
+                  <span className="font-mono text-xs px-2 py-1 rounded bg-primary/10 text-primary mr-2">
+                    {layer.count} posts
+                  </span>
                   Explore Layer
                   <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </div>
