@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Mona_Sans as FontSans, Fira_Mono as FontMono } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
+import { ThemeScript } from "@/components/theme-script"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import CommandPalette from "@/components/command-palette"
@@ -33,12 +34,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <ThemeScript />
+      </head>
       <body className={cn("min-h-screen font-sans antialiased", fontSans.variable, fontMono.variable)}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
           enableSystem={false}
-          disableTransitionOnChange={false}
           storageKey="stacked-theme"
         >
           <div className="relative flex min-h-screen flex-col">

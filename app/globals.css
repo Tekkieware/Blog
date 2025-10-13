@@ -2,7 +2,43 @@
 @config "../tailwind.config.ts";
 
 @layer base {
+
+  /* Set dark mode as default to prevent flash */
   :root {
+    /* Dark mode colors as default */
+    --background: 222 47% 8%;
+    --foreground: 210 40% 98%;
+
+    --card: 222 47% 10%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 47% 10%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 180 100% 50%;
+    --primary-foreground: 222 47% 10%;
+
+    --secondary: 162 100% 50%;
+    --secondary-foreground: 222 47% 10%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 180 100% 50%;
+
+    --radius: 0.5rem;
+  }
+
+  /* Light mode overrides */
+  :root:not(.dark) {
     /* Light mode colors */
     --background: 210 40% 98%;
     --foreground: 222 47% 11%;
@@ -37,36 +73,7 @@
     --radius: 0.5rem;
   }
 
-  .dark {
-    /* Dark mode colors */
-    --background: 222 47% 8%;
-    --foreground: 210 40% 98%;
-
-    --card: 222 47% 10%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222 47% 10%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 180 100% 50%;
-    --primary-foreground: 222 47% 10%;
-
-    --secondary: 162 100% 50%;
-    --secondary-foreground: 222 47% 10%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 180 100% 50%;
-  }
+  /* Dark mode is now the default in :root, no need for .dark class overrides */
 }
 
 @layer base {
@@ -75,7 +82,13 @@
   }
 
   body {
-    @apply bg-background text-foreground transition-colors duration-300;
+    @apply bg-background text-foreground;
+    /* Remove transition from body to prevent flicker during initial load */
+  }
+
+  /* Apply transitions to specific elements instead of body */
+  .theme-transition {
+    transition: background-color 300ms ease, border-color 300ms ease, color 300ms ease;
   }
 }
 
