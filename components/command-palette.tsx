@@ -166,7 +166,7 @@ export default function CommandPalette() {
         <CommandGroup heading="Actions">
           <CommandItem
             onSelect={() => {
-              router.push("/subscribe") // 👈 internal page
+              router.push("/newsletter") // 👈 internal page
               setOpen(false)
             }}
           >
