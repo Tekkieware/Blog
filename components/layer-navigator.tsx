@@ -53,16 +53,7 @@ export const layers = [
     slug: "peopleware",
     icon: "👥",
     count: 4,
-  },
-  {
-    id: "06",
-    title: "Overflow",
-    description: "Random thoughts, experiments, and brain dumps",
-    color: "pink",
-    slug: "overflow",
-    icon: "💭",
-    count: 10,
-  },
+  }
 ]
 
 // Helper function to get color based on layer
