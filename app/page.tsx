@@ -6,6 +6,7 @@ import { ArrowRight, Pause, Play } from "lucide-react"
 import { FeaturedMarquee } from "@/components/featured-marquee"
 import { Button } from "@/components/ui-tailwind/button"
 import { useState } from "react"
+import { NewsletterSubscribe } from "@/components/newsletter-subscribe"
 
 export default function Home() {
   const [isPaused, setIsPaused] = useState(false)
@@ -59,6 +60,24 @@ export default function Home() {
           <LayerNavigator />
         </div>
       </section>
+      {/* Newletter Subscription section */}
+      <section className="py-16 bg-background">
+        <div className="container">
+          <div className="flex items-center mb-8">
+            <div className="h-px flex-1 bg-border"></div>
+          </div>
+          <div className="text-center space-y-4 pt-8">
+            <h2 className="text-xl md:text-2xl font-bold font-mono">Ready to Level Up?</h2>
+            <p className="text-muted-foreground">Join over 10,000 engineers receiving weekly insights</p>
+            <div className="flex justify-center">
+              <NewsletterSubscribe variant="inline" className="max-w-md" />
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
+
+
+
   )
 }

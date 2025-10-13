@@ -63,15 +63,6 @@ export default function CommandPalette() {
             <User className="mr-2 h-4 w-4" />
             <span>About</span>
           </CommandItem>
-          <CommandItem
-            onSelect={() => {
-              router.push("/overflow")
-              setOpen(false)
-            }}
-          >
-            <Layers className="mr-2 h-4 w-4" />
-            <span>Overflow</span>
-          </CommandItem>
         </CommandGroup>
         <CommandSeparator />
         <CommandGroup heading="Layers">
