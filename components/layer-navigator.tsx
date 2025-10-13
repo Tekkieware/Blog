@@ -1,3 +1,4 @@
+
 "use client"
 
 import { cn } from "@/lib/utils"
@@ -5,9 +6,21 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import { ArrowRight } from "lucide-react"
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui-tailwind/card"
+import { useEffect, useState } from "react"
+
+// Define the Layer interface
+interface Layer {
+  id: string;
+  title: string;
+  description: string;
+  color: string;
+  slug: string;
+  icon: string;
+  count: number;
+}
 
 // Export layers data so it can be used in other components
-export const layers = [
+export const layers: Layer[] = [
   {
     id: "01",
     title: "Frontend",
@@ -15,7 +28,7 @@ export const layers = [
     color: "indigo",
     slug: "frontend",
     icon: "🎨",
-    count: 12,
+    count: 0, // Initial count
   },
   {
     id: "02",
@@ -24,7 +37,7 @@ export const layers = [
     color: "cyan",
     slug: "backend",
     icon: "⚙️",
-    count: 8,
+    count: 0, // Initial count
   },
   {
     id: "03",
@@ -33,7 +46,7 @@ export const layers = [
     color: "orange",
     slug: "devops",
     icon: "🚀",
-    count: 5,
+    count: 0, // Initial count
   },
   {
     id: "04",
@@ -42,7 +55,7 @@ export const layers = [
     color: "blue",
     slug: "architecture",
     icon: "🏗️",
-    count: 7,
+    count: 0, // Initial count
   },
   {
     id: "05",
@@ -51,7 +64,7 @@ export const layers = [
     color: "emerald",
     slug: "peopleware",
     icon: "👥",
-    count: 4,
+    count: 0, // Initial count
   }
 ]
 
@@ -76,9 +89,32 @@ export const getLayerColor = (color: string) => {
 }
 
 export function LayerNavigator() {
+  const [layerCounts, setLayerCounts] = useState<{ [key: string]: number }>({});
+
+  useEffect(() => {
+    const fetchLayerCounts = async () => {
+      try {
+        const response = await fetch('/api/posts/layer/count');
+        if (response.ok) {
+          const counts = await response.json();
+          setLayerCounts(counts);
+        }
+      } catch (error) {
+        console.error("Failed to fetch layer counts:", error);
+      }
+    };
+
+    fetchLayerCounts();
+  }, []);
+
+  const updatedLayers = layers.map(layer => ({
+    ...layer,
+    count: layerCounts[layer.slug] || 0,
+  }));
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {layers.map((layer) => (
+      {updatedLayers.map((layer) => (
         <Link href={`/posts?layer=${layer.slug}`} key={layer.id}>
           <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }} className="h-full">
             <Card
@@ -104,7 +140,7 @@ export function LayerNavigator() {
               <CardFooter className="pt-0 mt-auto">
                 <div className="flex items-center text-sm font-medium text-primary group">
                   <span className="font-mono text-xs px-2 py-1 rounded bg-primary/10 text-primary mr-2">
-                    {layer.count} posts
+                    {layer.count} {layer.count === 1 ? 'post' : 'posts'}
                   </span>
                   Explore Layer
                   <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -117,3 +153,4 @@ export function LayerNavigator() {
     </div>
   )
 }
+
