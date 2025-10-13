@@ -209,7 +209,7 @@ export function NewsletterSubscribe({ variant = "default", className }: Newslett
                     {/* Heading */}
                     <div className="space-y-2">
                         <h2 className="font-mono text-2xl md:text-3xl font-bold">
-                            <span className="text-primary">&gt;</span> Join the Stack
+                            <span className="text-primary">&gt;</span> Join Us
                         </h2>
                         <p className="text-md md:text-lg text-muted-foreground max-w-xl mx-auto">
                             Get regular engineering insights, architectural patterns, and senior-level perspectives delivered straight
