@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { MessageSquare, Calendar, Tag, ArrowLeft, Clock, User } from "lucide-react";
+import { MessageSquare, Calendar, Tag, ArrowLeft, Clock, User, Share2 } from "lucide-react";
 import Link from "next/link";
 import { TableOfContents } from "@/components/table-of-content";
 import { MarkdownRenderer } from "@/components/markdown-renderer";
@@ -94,7 +94,7 @@ export default function PostDetail({ params }: { params: Promise<{ slug: string 
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <StickyBackButton link="posts" />
+      <StickyBackButton />
 
       <div className="container pb-16">
         <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr_280px] gap-8">
@@ -191,18 +191,24 @@ export default function PostDetail({ params }: { params: Promise<{ slug: string 
               <div className="flex flex-col sm:flex-row justify-between gap-4">
                 <Button
                   variant="outline"
-                  asChild
                   className="border-primary/20 hover:bg-primary/5 hover:border-primary/30 text-primary"
+                  onClick={() => {
+                    if (navigator.share) {
+                      navigator.share({
+                        title: post.title,
+                        text: post.excerpt,
+                        url: window.location.href,
+                      })
+                        .then(() => console.log('Successful share'))
+                        .catch((error) => console.log('Error sharing', error));
+                    } else {
+                      // Fallback for browsers that do not support the Web Share API
+                      alert('Web Share API is not supported in your browser.');
+                    }
+                  }}
                 >
-                  <a
-                    href="https://twitter.com/intent/tweet"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2"
-                  >
-                    <MessageSquare className="h-4 w-4" />
-                    Share on X
-                  </a>
+                  <Share2 className="h-4 w-4 mr-2" />
+                  Share
                 </Button>
 
                 <Button className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-emphasis">

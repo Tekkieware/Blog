@@ -1,10 +1,11 @@
 import { cn } from '@/lib/utils'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
+import { Button } from './ui/button'
 
-const StickyBackButton = ({ link }: { link: string }) => {
+const StickyBackButton = () => {
     const [scrolled, setScrolled] = useState(false)
     const pathname = usePathname()
 
@@ -17,6 +18,12 @@ const StickyBackButton = ({ link }: { link: string }) => {
         return () => window.removeEventListener("scroll", handleScroll)
     }, [])
 
+    const router = useRouter()
+
+    function backHandler() {
+        router.back()
+    }
+
     return (
         <>
             <div
@@ -28,26 +35,28 @@ const StickyBackButton = ({ link }: { link: string }) => {
                 )}
             >
                 <div className="container py-6">
-                    <Link
-                        href={`/${link}`}
+                    <Button
+                        variant="link"
+                        onClick={() => backHandler()}
                         className="inline-flex items-center text-sm text-primary hover:text-primary/80 transition-colors"
                     >
-                        <ArrowLeft className="mr-2 h-4 w-4" />
+                        <ArrowLeft className="mr-1 h-4 w-4" />
                         Back
-                    </Link>
+                    </Button>
                 </div>
             </div>
 
 
             <div className="sticky top-15 z-50 hidden lg:block bg-transparent">
                 <div className="container py-6">
-                    <Link
-                        href={`/${link}`}
+                    <Button
+                        variant="link"
+                        onClick={() => backHandler()}
                         className="inline-flex items-center text-sm text-primary hover:text-primary/80 transition-colors"
                     >
-                        <ArrowLeft className="mr-2 h-4 w-4" />
+                        <ArrowLeft className="mr-1 h-4 w-4" />
                         Back
-                    </Link>
+                    </Button>
                 </div>
             </div>
 
