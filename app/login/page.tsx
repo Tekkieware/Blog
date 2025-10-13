@@ -16,23 +16,28 @@ export default function LoginPage() {
   const searchParams = useSearchParams()
   const redirect = searchParams.get("redirect") || "/admin"
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
     setError("")
 
-    // Simple hardcoded password check
-    if (password === "admin") {
-      // Set auth cookie that expires in 5 minutes
-      setCookie("auth-token", "authenticated", {
-        maxAge: 300, // 5 minutes in seconds
-        path: "/",
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ password }),
       })
 
-      // Redirect to admin or the requested page
-      router.push(redirect)
-    } else {
-      setError("Invalid password")
+      if (res.ok) {
+        router.push(redirect)
+      } else {
+        setError("Invalid password")
+        setIsLoading(false)
+      }
+    } catch (error) {
+      setError("An error occurred. Please try again.")
       setIsLoading(false)
     }
   }
@@ -87,8 +92,8 @@ export default function LoginPage() {
         </div>
 
         <div className="text-center text-sm text-muted-foreground">
-          <p>Default password: "admin"</p>
-          <p className="mt-1">Session expires after 5 minutes</p>
+          <p>Enter the password to access the admin dashboard.</p>
+          <p className="mt-1">Session expires after 24 hours</p>
         </div>
       </div>
     </div>
