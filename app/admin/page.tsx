@@ -19,6 +19,7 @@ import Link from "next/link"
 import { getPostsAndCount, deletePost, getLayerCounts } from "@/lib/services/postService";
 import { IPost } from "@/models/post";
 import { toast } from "sonner";
+import AdminPageSkeleton from "./loading"
 
 export default function AdminPage() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -80,7 +81,7 @@ export default function AdminPage() {
   const filteredPosts = posts;
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <AdminPageSkeleton />
   }
 
   return (
