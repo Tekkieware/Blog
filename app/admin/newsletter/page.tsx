@@ -18,6 +18,7 @@ import {
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog';
 import { TableRowSkeleton } from '@/components/table-row-skeleton';
+import { toast } from 'sonner';
 
 interface Subscriber {
   _id: string;
@@ -36,9 +37,11 @@ export default function NewsletterManagementPage() {
         if (response.ok) {
           const data = await response.json();
           setSubscribers(data);
+        } else {
+          toast.error('Failed to fetch subscribers.');
         }
       } catch (error) {
-        console.error('Error fetching subscribers:', error);
+        toast.error('Error fetching subscribers.');
       }
       setLoading(false);
     };
@@ -47,6 +50,7 @@ export default function NewsletterManagementPage() {
   }, []);
 
   const handleDelete = async (id: string) => {
+    const toastId = toast.loading('Deleting subscriber...');
     try {
       const response = await fetch(`/api/newsletter/subscribers/${id}`, {
         method: 'DELETE',
@@ -54,9 +58,12 @@ export default function NewsletterManagementPage() {
 
       if (response.ok) {
         setSubscribers(subscribers.filter((subscriber) => subscriber._id !== id));
+        toast.success('Subscriber deleted successfully!', { id: toastId });
+      } else {
+        toast.error('Failed to delete subscriber.', { id: toastId });
       }
     } catch (error) {
-      console.error('Error deleting subscriber:', error);
+      toast.error('Error deleting subscriber.', { id: toastId });
     }
   };
 
