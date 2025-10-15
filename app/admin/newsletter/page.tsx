@@ -17,6 +17,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationPrevious,
+  PaginationLink,
+  PaginationNext,
+} from "@/components/ui/pagination";
 import { TableRowSkeleton } from '@/components/table-row-skeleton';
 import { toast } from 'sonner';
 
@@ -29,14 +37,18 @@ interface Subscriber {
 export default function NewsletterManagementPage() {
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
 
   useEffect(() => {
     const fetchSubscribers = async () => {
+      setLoading(true);
       try {
-        const response = await fetch('/api/newsletter/subscribers');
+        const response = await fetch(`/api/newsletter/subscribers?page=${currentPage}&limit=10`);
         if (response.ok) {
-          const data = await response.json();
+          const { subscribers: data, total } = await response.json();
           setSubscribers(data);
+          setTotalPages(Math.ceil(total / 10));
         } else {
           toast.error('Failed to fetch subscribers.');
         }
@@ -47,7 +59,7 @@ export default function NewsletterManagementPage() {
     };
 
     fetchSubscribers();
-  }, []);
+  }, [currentPage]);
 
   const handleDelete = async (id: string) => {
     const toastId = toast.loading('Deleting subscriber...');
@@ -120,6 +132,33 @@ export default function NewsletterManagementPage() {
               )}
             </TableBody>
           </Table>
+          {totalPages > 1 && (
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setCurrentPage((prev) => Math.max(prev - 1, 1));
+                    }}
+                  />
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationLink href="#">{currentPage}</PaginationLink>
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationNext
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+                    }}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          )}
         </CardContent>
       </Card>
     </div>
