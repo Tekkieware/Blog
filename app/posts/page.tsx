@@ -98,7 +98,7 @@ export default function PostsPage() {
 
         {loading ? (
           <PaginationLoader />
-        ) : (
+        ) : totalPages > 1 && (
           <Pagination>
             <PaginationContent>
               <PaginationItem>
