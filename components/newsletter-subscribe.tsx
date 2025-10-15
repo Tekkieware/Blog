@@ -19,27 +19,41 @@ export function NewsletterSubscribe({ variant = "default", className }: Newslett
     const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
     const [errorMessage, setErrorMessage] = useState("")
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-        setStatus("loading")
-        setErrorMessage("")
+const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus("loading");
+    setErrorMessage("");
 
-        // Validate email
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        if (!emailRegex.test(email)) {
-            setStatus("error")
-            setErrorMessage("Please enter a valid email address")
-            return
-        }
-
-        // Simulate API call
-        setTimeout(() => {
-            setStatus("success")
-            setEmail("")
-            // Reset after 3 seconds
-            setTimeout(() => setStatus("idle"), 3000)
-        }, 1500)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        setStatus("error");
+        setErrorMessage("Please enter a valid email address");
+        return;
     }
+
+    try {
+        const response = await fetch('/api/newsletter/subscribe', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email }),
+        });
+
+        if (response.ok) {
+            setStatus("success");
+            setEmail("");
+            setTimeout(() => setStatus("idle"), 3000);
+        } else {
+            const data = await response.json();
+            setErrorMessage(data.message || "Something went wrong");
+            setStatus("error");
+        }
+    } catch (error) {
+        setErrorMessage("Failed to subscribe. Please try again later.");
+        setStatus("error");
+    }
+};
 
     if (variant === "compact") {
         return (
