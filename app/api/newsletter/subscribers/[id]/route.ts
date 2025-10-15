@@ -7,7 +7,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
   await dbConnect();
 
   try {
-    const { id } = params;
+    const { id } = await params;
 
     if (!id) {
       return NextResponse.json({ message: 'Subscriber ID is required' }, { status: 400 });
