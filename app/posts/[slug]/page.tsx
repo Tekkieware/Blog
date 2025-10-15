@@ -9,6 +9,7 @@ import { TableOfContents } from "@/components/table-of-content";
 import { MarkdownRenderer } from "@/components/markdown-renderer";
 import StickyBackButton from "@/components/sticky-back-button";
 import React, { useEffect, useState } from "react";
+import { ShareModal } from "@/components/share-modal";
 import PostDetailSkeleton from "@/components/post-detail-skeleton";
 import { IPost } from "@/models/post";
 import Image from "next/image";
@@ -61,6 +62,8 @@ export default function PostDetail({ params }: { params: Promise<{ slug: string 
   const { slug } = promiseParam;
   const [post, setPost] = useState<IPost | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -192,20 +195,7 @@ export default function PostDetail({ params }: { params: Promise<{ slug: string 
                 <Button
                   variant="outline"
                   className="border-primary/20 hover:bg-primary/5 hover:border-primary/30 text-primary"
-                  onClick={() => {
-                    if (navigator.share) {
-                      navigator.share({
-                        title: post.title,
-                        text: post.excerpt,
-                        url: window.location.href,
-                      })
-                        .then(() => console.log('Successful share'))
-                        .catch((error) => console.log('Error sharing', error));
-                    } else {
-                      // Fallback for browsers that do not support the Web Share API
-                      alert('Web Share API is not supported in your browser.');
-                    }
-                  }}
+                  onClick={() => setIsShareModalOpen(true)}
                 >
                   <Share2 className="h-4 w-4 mr-2" />
                   Share
@@ -239,6 +229,13 @@ export default function PostDetail({ params }: { params: Promise<{ slug: string 
           </aside>
         </div>
       </div>
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        title={post.title}
+        url={`/posts/${post.slug}`}
+        description={post.excerpt}
+      />
     </div>
   );
 }
