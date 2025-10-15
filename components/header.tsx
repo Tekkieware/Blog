@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import { cn } from "@/lib/utils"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { ModeToggle } from "@/components/mode-toggle"
 import { CommandIcon, Pen, Terminal } from "lucide-react"
 import { Button } from "@/components/ui-tailwind/button"
@@ -13,6 +13,7 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
 
+  const router = useRouter()
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 10)
@@ -59,7 +60,7 @@ export default function Header() {
             <CommandIcon className="h-4 w-4 text-primary" />
           </Button>
           <ModeToggle />
-          <Button variant="default" className="rounded-md hidden sm:block bg-primary text-sm text-primary-foreground hover:bg-primary/90">
+          <Button onClick={() => router.push("/newsletter")} variant="default" className="rounded-md hidden sm:block bg-primary text-sm text-primary-foreground hover:bg-primary/90">
             Subscribe
           </Button>
         </div>

@@ -14,6 +14,7 @@ import PostDetailSkeleton from "@/components/post-detail-skeleton";
 import { IPost } from "@/models/post";
 import Image from "next/image";
 import { readingTime } from 'reading-time-estimator'
+import { useRouter } from "next/navigation";
 
 const generateSlug = (text: string): string => {
   return text
@@ -64,6 +65,8 @@ export default function PostDetail({ params }: { params: Promise<{ slug: string 
   const [loading, setLoading] = useState(true);
 
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+
+  const router = useRouter()
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -201,7 +204,7 @@ export default function PostDetail({ params }: { params: Promise<{ slug: string 
                   Share
                 </Button>
 
-                <Button className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-emphasis">
+                <Button onClick={() => router.push("/newsletter")} className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-emphasis">
                   Subscribe for updates
                 </Button>
               </div>
