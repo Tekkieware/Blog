@@ -21,6 +21,8 @@ import { IPost } from "@/models/post";
 import { toast } from "sonner";
 import AdminPageSkeleton from "./loading"
 
+import AdminNav from '@/components/admin-nav';
+
 export default function AdminPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [posts, setPosts] = useState<IPost[]>([]);
@@ -106,6 +108,7 @@ export default function AdminPage() {
           </Button>
         </div>
       </header>
+      
 
       <main className="container py-6">
         <div className="flex flex-col space-y-6">
