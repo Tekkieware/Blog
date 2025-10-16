@@ -15,6 +15,7 @@ import { IPost } from "@/models/post";
 import Image from "next/image";
 import { readingTime } from 'reading-time-estimator'
 import { useRouter } from "next/navigation";
+import { CommentSection } from "@/components/comment-section";
 
 const generateSlug = (text: string): string => {
   return text
@@ -209,6 +210,9 @@ export default function PostDetail({ params }: { params: Promise<{ slug: string 
                 </Button>
               </div>
             </footer>
+            <div className="mt-16 not-prose">
+              <CommentSection postSlug={slug} />
+            </div>
           </article>
 
           {/* Debug Notes - Desktop Only */}
