@@ -2,6 +2,7 @@ import NextAuth from "next-auth"
 import { MongoDBAdapter } from "@auth/mongodb-adapter"
 import Resend from "next-auth/providers/resend"
 import { MongoClient } from "mongodb"
+import { sendVerificationRequest } from "./email-templates"
 
 const client = new MongoClient(process.env.MONGODB_URI!)
 const clientPromise = Promise.resolve(client)
@@ -12,6 +13,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         Resend({
             apiKey: process.env.RESEND_API_KEY,
             from: process.env.EMAIL_FROM,
+            sendVerificationRequest,
         }),
     ],
     pages: {
