@@ -76,7 +76,7 @@ export default function AdminPage() {
   };
 
   const handleLogout = () => {
-    deleteCookie("auth-token")
+    deleteCookie("isLoggedIn")
     router.push("/login")
   }
 
@@ -108,7 +108,7 @@ export default function AdminPage() {
           </Button>
         </div>
       </header>
-      
+
 
       <main className="container py-6">
         <div className="flex flex-col space-y-6">
