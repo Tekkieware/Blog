@@ -10,7 +10,7 @@ export async function POST(request: Request) {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     })
-    setCookie('auth-token', 'authenticated', {
+    setCookie('isLoggedIn', 'true', {
       req: request as any,
       res: response as any,
       maxAge: 86400, // 24 hours in seconds
