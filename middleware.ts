@@ -1,17 +1,15 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
-export function middleware(request: NextRequest) {
-  // Check if the path starts with /admin
-  if (request.nextUrl.pathname.startsWith("/admin")) {
-    // Get the auth cookie
-    const authCookie = request.cookies.get("auth-token")
+export function middleware(req: NextRequest) {
+  // Admin routes - use existing cookie-based auth
+  if (req.nextUrl.pathname.startsWith("/admin")) {
+    const isLoggedIn = req.cookies.get("isLoggedIn")?.value === "true"
 
-    // If no auth cookie or it's invalid, redirect to login
-    if (!authCookie || authCookie.value !== "authenticated") {
-      const loginUrl = new URL("/login", request.url)
-      // Add a redirect parameter to return to the admin page after login
-      loginUrl.searchParams.set("redirect", request.nextUrl.pathname)
+    if (!isLoggedIn) {
+      // Redirect to the existing admin login page
+      const loginUrl = new URL("/login", req.url)
+      loginUrl.searchParams.set("redirect", req.nextUrl.pathname)
       return NextResponse.redirect(loginUrl)
     }
   }
@@ -19,7 +17,10 @@ export function middleware(request: NextRequest) {
   return NextResponse.next()
 }
 
-// Configure the middleware to run only on /admin routes
+// Configure the middleware to run on admin routes only
+// Auth.js will handle its own middleware for public user sessions
 export const config = {
-  matcher: "/admin/:path*",
+  matcher: [
+    "/admin/:path*",
+  ],
 }
