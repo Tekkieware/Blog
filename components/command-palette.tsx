@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
-import { FileCode2, Layers, Mail, Moon, Sun, Tag, Terminal, User } from "lucide-react"
+import { useSession, signOut } from "next-auth/react"
+import { FileCode2, Layers, Mail, Moon, Sun, Tag, Terminal, User, LogIn, LogOut } from "lucide-react"
 import {
   CommandDialog,
   CommandEmpty,
@@ -18,6 +19,7 @@ export default function CommandPalette() {
   const [open, setOpen] = useState(false)
   const router = useRouter()
   const { setTheme } = useTheme()
+  const { data: session, status } = useSession()
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -152,6 +154,41 @@ export default function CommandPalette() {
             <Tag className="mr-2 h-4 w-4" />
             <span>Architecture</span>
           </CommandItem>
+        </CommandGroup>
+        <CommandSeparator />
+        <CommandGroup heading="Account">
+          {status === "loading" ? (
+            <CommandItem disabled>
+              <User className="mr-2 h-4 w-4" />
+              <span>Loading...</span>
+            </CommandItem>
+          ) : session ? (
+            <>
+              <CommandItem disabled>
+                <User className="mr-2 h-4 w-4" />
+                <span>Signed in as {session.user?.email}</span>
+              </CommandItem>
+              <CommandItem
+                onSelect={async () => {
+                  await signOut({ callbackUrl: "/" })
+                  setOpen(false)
+                }}
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Sign Out</span>
+              </CommandItem>
+            </>
+          ) : (
+            <CommandItem
+              onSelect={() => {
+                router.push("/signin")
+                setOpen(false)
+              }}
+            >
+              <LogIn className="mr-2 h-4 w-4" />
+              <span>Sign In</span>
+            </CommandItem>
+          )}
         </CommandGroup>
         <CommandSeparator />
         <CommandGroup heading="Actions">
