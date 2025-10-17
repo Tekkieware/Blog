@@ -954,6 +954,7 @@ export function CommentSection({ postSlug, postAuthor, className }: CommentSecti
     const [loading, setLoading] = useState(true)
     const [stats, setStats] = useState({ totalComments: 0, totalReplies: 0, totalInteractions: 0 })
     const [sortBy, setSortBy] = useState<"newest" | "popular">("newest")
+    const [isAdmin, setIsAdmin] = useState(() => isAdminClient()) // Check admin status
 
     const fetchComments = async () => {
         try {
@@ -978,6 +979,11 @@ export function CommentSection({ postSlug, postAuthor, className }: CommentSecti
     useEffect(() => {
         fetchComments()
     }, [postSlug])
+
+    // Check admin status
+    useEffect(() => {
+        setIsAdmin(isAdminClient())
+    }, [])
 
     const handleCommentAdded = (newComment: Comment) => {
         setComments(prev => [newComment, ...prev])
@@ -1052,10 +1058,10 @@ export function CommentSection({ postSlug, postAuthor, className }: CommentSecti
                             <p className="text-sm text-muted-foreground">
                                 {stats.totalInteractions} {stats.totalInteractions === 1 ? 'interaction' : 'interactions'} from the community
                             </p>
-                            {session?.user ? (
+                            {(session?.user || isAdmin) ? (
                                 <Badge variant="secondary" className="text-xs">
                                     <User className="h-3 w-3 mr-1" />
-                                    Signed in
+                                    {isAdmin ? "Admin" : "Signed in"}
                                 </Badge>
                             ) : (
                                 <Badge variant="outline" className="text-xs border-yellow-200 text-yellow-700 dark:border-yellow-800 dark:text-yellow-300">
