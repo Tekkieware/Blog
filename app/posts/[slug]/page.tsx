@@ -16,6 +16,7 @@ import Image from "next/image";
 import { readingTime } from 'reading-time-estimator'
 import { useRouter } from "next/navigation";
 import { CommentSection } from "@/components/comment-section";
+import { CommentStats } from "@/components/comment-stats";
 
 const generateSlug = (text: string): string => {
   return text
@@ -134,6 +135,7 @@ export default function PostDetail({ params }: { params: Promise<{ slug: string 
                   <User className="mr-2 h-4 w-4" />
                   {post.author}
                 </div>
+                <CommentStats postSlug={slug} />
               </div>
 
               {/* Title and Excerpt */}
@@ -211,7 +213,7 @@ export default function PostDetail({ params }: { params: Promise<{ slug: string 
               </div>
             </footer>
             <div className="mt-16 not-prose">
-              <CommentSection postSlug={slug} />
+              <CommentSection postSlug={slug} postAuthor={post.author} />
             </div>
           </article>
 
