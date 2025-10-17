@@ -25,6 +25,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             // Add user id to session
             if (session.user && user) {
                 session.user.id = user.id
+                // // Check if user is admin (you can adjust this logic)
+                // session.user.isAdmin = user.email === "reply@io.tech" || user.email === process.env.ADMIN_EMAIL
             }
             return session
         },

@@ -1,3 +1,4 @@
+// Server-side auth utilities
 import { auth } from "@/lib/auth"
 
 /**
@@ -18,15 +19,10 @@ export async function getCurrentUser() {
 }
 
 /**
- * Check if user is admin (using cookie-based auth)
+ * Check if user is admin (using cookie-based auth) - SERVER SIDE ONLY
  * This is separate from the public comment authentication
  */
 export function isAdmin(request?: Request) {
-    if (typeof window !== "undefined") {
-        // Client-side check
-        return document.cookie.includes("isLoggedIn=true")
-    }
-
     if (request) {
         // Server-side check
         const cookieHeader = request.headers.get("cookie")
