@@ -1,434 +1,1123 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
+import React, { useState, useEffect, useRef } from "react"
+import { useSession } from "next-auth/react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Card } from "./ui-tailwind/card"
 import { Button } from "./ui-tailwind/button"
 import { Badge } from "./ui-tailwind/badge"
-import { MessageSquare, Reply, MoreVertical, Flag, Edit, Trash2, Send, User, Heart, Code } from "lucide-react"
+import { MessageSquare, Reply, MoreVertical, Flag, Edit, Trash2, Send, User, Heart, Code, Loader2, Crown } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { CommentForm } from "./comment-form"
+import { toast } from "sonner"
+import { formatDistanceToNow } from "date-fns"
+import { isAdminClient } from "@/lib/auth-client"
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+
+interface Reply {
+    _id: string
+    content: string
+    user: {
+        email: string
+        name: string
+    }
+    createdAt: string
+    updatedAt: string
+    contentUpdatedAt: string
+}
 
 interface Comment {
-    id: string
-    author: string
-    avatar?: string
+    _id: string
+    postSlug: string
     content: string
-    timestamp: string
-    likes: number
-    replies?: Comment[]
-    isAuthor?: boolean
-    badge?: "Author" | "Moderator" | "Verified"
+    user: {
+        email: string
+        name: string
+    }
+    replies: Reply[]
+    createdAt: string
+    updatedAt: string
+    contentUpdatedAt: string
 }
 
 interface CommentSectionProps {
     postSlug: string
+    postAuthor?: string
     className?: string
 }
 
-// Mock comments data
-const mockComments: Comment[] = [
-    {
-        id: "1",
-        author: "Alex Chen",
-        content:
-            "This is exactly what I needed! The composition pattern has really helped me structure my components better. One question though - how do you handle deeply nested composition? Do you have a rule of thumb for when to stop composing?",
-        timestamp: "2 hours ago",
-        likes: 24,
-        badge: "Verified",
-        replies: [
-            {
-                id: "1-1",
-                author: "Senior Dev",
-                content:
-                    "Great question! I generally follow the 'three levels' rule - if you find yourself nesting more than 3 levels deep, it's usually a sign to extract that into a separate component. The key is to look for cohesive units of functionality that make sense together.",
-                timestamp: "1 hour ago",
-                likes: 15,
-                isAuthor: true,
-                badge: "Author",
-            },
-            {
-                id: "1-2",
-                author: "Maya Rodriguez",
-                content: "Thanks for clarifying! This really helps understand when to extract vs. when to compose.",
-                timestamp: "45 minutes ago",
-                likes: 5,
-            },
-        ],
-    },
-    {
-        id: "2",
-        author: "Jordan Kim",
-        content:
-            "The compound components pattern is a game changer. I've been using it in our design system and it's made the API so much more intuitive for other devs. Would love to see a follow-up on handling state management with compound components!",
-        timestamp: "5 hours ago",
-        likes: 31,
-        badge: "Verified",
-    },
-    {
-        id: "3",
-        author: "Sam Taylor",
-        content:
-            "Code examples are super clear. Quick tip for anyone implementing this: TypeScript generics work really well with composition patterns. Makes your component props type-safe while maintaining flexibility.",
-        timestamp: "1 day ago",
-        likes: 42,
-        replies: [
-            {
-                id: "3-1",
-                author: "Chris Morgan",
-                content: "Could you share a quick example of how you use generics with this pattern?",
-                timestamp: "20 hours ago",
-                likes: 8,
-            },
-        ],
-    },
-]
-
-function CommentItem({
-    comment,
-    onReply,
-    onLike,
-    level = 0,
+// Reply Form Component
+function ReplyForm({
+    commentId,
+    postAuthor,
+    onReplyAdded,
+    onCancel
 }: {
-    comment: Comment
-    onReply: (commentId: string) => void
-    onLike: (commentId: string) => void
-    level?: number
+    commentId: string
+    postAuthor?: string
+    onReplyAdded: () => void
+    onCancel: () => void
 }) {
-    const [isLiked, setIsLiked] = useState(false)
-    const [showMenu, setShowMenu] = useState(false)
-    const [isExpanded, setIsExpanded] = useState(true)
+    const { data: session } = useSession()
+    const [content, setContent] = useState("")
+    const [userName, setUserName] = useState("")
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [isAdmin, setIsAdmin] = useState(() => isAdminClient()) // Initialize with current admin status
+    const [isInitialized, setIsInitialized] = useState(false)
 
-    const handleLike = () => {
-        setIsLiked(!isLiked)
-        onLike(comment.id)
+    // Check admin status and prefill if admin
+    useEffect(() => {
+        const checkAdmin = () => {
+            const adminStatus = isAdminClient()
+            setIsAdmin(adminStatus)
+
+            // If admin, prefill with actual post author name + admin tag
+            if (adminStatus && !userName) {
+                const adminName = postAuthor ? `${postAuthor} (Admin)` : "Post Author (Admin)"
+                setUserName(adminName)
+            }
+
+            setIsInitialized(true)
+        }
+
+        checkAdmin()
+    }, [])
+
+    // Show loading state while checking admin status
+    if (!isInitialized) {
+        return (
+            <Card className="p-4 mt-4 border-primary/20 bg-primary/5">
+                <div className="text-center">
+                    <p className="text-sm text-muted-foreground">Loading...</p>
+                </div>
+            </Card>
+        )
+    }
+
+    // Additional check - if no session and not admin, show signin prompt
+    if (!session?.user?.email && !isAdmin) {
+        return (
+            <Card className="p-4 mt-4 border-primary/20 bg-primary/5">
+                <div className="text-center">
+                    <p className="text-sm text-muted-foreground mb-3">
+                        Please sign in to reply to this comment
+                    </p>
+                    <div className="flex gap-2 justify-center">
+                        <Button asChild size="sm">
+                            <a href="/signin">Sign In</a>
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={onCancel}>
+                            Cancel
+                        </Button>
+                    </div>
+                </div>
+            </Card>
+        )
+    }
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
+
+        const submitToastId = toast.loading("Posting your comment...")
+
+        if (!session?.user?.email && !isAdmin) {
+            toast.error("Please sign in to reply", { id: submitToastId })
+            return
+        }
+
+        if (!content.trim()) {
+            toast.error("Please fill in your comment", { id: submitToastId })
+            return
+        }
+
+        // Use userName if provided, otherwise use email (handle admin case)
+        const userEmail = session?.user?.email || (isAdmin ? "reply@blog.io.tech" : "")
+        const displayName = userName.trim() || userEmail?.split('@')[0] || "Anonymous"
+
+        // For admin replies, use special handling
+        const adminName = postAuthor ? `${postAuthor} (Admin)` : "Post Author (Admin)"
+        const isAdminReply = isAdmin && userName.trim() === adminName
+        const replyUserName = isAdminReply ? adminName : displayName
+        const replyEmail = isAdminReply ? "reply@blog.io.tech" : userEmail
+
+        setIsSubmitting(true)
+
+        try {
+            const response = await fetch(`/api/comments/${commentId}/reply`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    content: content.trim(),
+                    userName: replyUserName,
+                    userEmail: replyEmail,
+                    isAdmin: isAdminReply,
+                }),
+            })
+
+            const data = await response.json()
+
+            if (!response.ok) {
+                throw new Error(data.error || "Failed to post reply")
+            }
+
+            toast.success("Reply posted successfully!", { id: submitToastId })
+            setContent("")
+            onReplyAdded()
+            onCancel()
+
+        } catch (error) {
+            console.error("Error posting reply:", error)
+            toast.error(error instanceof Error ? error.message : "Failed to post reply", { id: submitToastId })
+        } finally {
+            setIsSubmitting(false)
+        }
     }
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={cn("relative", level > 0 && "ml-8 md:ml-12")}
-        >
-            {/* Connection line for replies */}
-            {level > 0 && (
-                <div className="absolute -left-8 md:-left-12 top-0 bottom-0 w-px bg-border">
-                    <div className="absolute top-6 -left-2 w-4 h-px bg-border" />
-                </div>
-            )}
-
-            <Card
-                className={cn(
-                    "p-4 border-border hover:border-primary/30 transition-colors",
-                    comment.isAuthor && "bg-primary/5 border-primary/20",
-                )}
-            >
-                <div className="flex gap-3">
-                    {/* Avatar */}
-                    <div className="flex-shrink-0">
-                        <div className="h-10 w-10 rounded-full bg-primary/10 border-2 border-primary/20 flex items-center justify-center">
-                            {comment.avatar ? (
-                                <img src={comment.avatar || "/placeholder.svg"} alt={comment.author} className="rounded-full" />
-                            ) : (
-                                <User className="h-5 w-5 text-primary" />
+        <Card className="p-3 sm:p-4 mt-4 border-primary/20">
+            <form onSubmit={handleSubmit} className="space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                        <input
+                            type="text"
+                            placeholder={isAdmin ? "Post Author (Admin)" : "Your name (optional)"}
+                            value={userName}
+                            onChange={(e) => setUserName(e.target.value)}
+                            className={cn(
+                                "px-3 py-2 border border-border rounded-md bg-background text-sm w-full",
+                                isAdmin && userName === "Post Author" && "border-amber-300 bg-amber-50 dark:bg-amber-950/20"
                             )}
+                            maxLength={50}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                            {isAdmin && userName.trim() === "Post Author" ? (
+                                <span className="text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                                    <Crown className="h-3 w-3" />
+                                    As: Post Author (reply@blog.io.tech)
+                                </span>
+                            ) : userName.trim() ? (
+                                `As: ${userName}`
+                            ) : (
+                                `As: ${session?.user?.email?.split('@')[0] || "Anonymous"}`
+                            )}
+                        </p>
+                    </div>
+                    <input
+                        type="email"
+                        value={isAdmin && userName === "Post Author" ? "reply@blog.io.tech" : session?.user?.email || ""}
+                        disabled
+                        className="px-3 py-2 border border-border rounded-md bg-muted text-sm"
+                    />
+                </div>
+                <textarea
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    placeholder="Write your reply..."
+                    className="w-full min-h-[80px] px-3 py-2 border border-border rounded-md bg-background resize-none text-sm"
+                    required
+                    maxLength={1000}
+                />
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                    <span className="text-xs text-muted-foreground">{content.length}/1000</span>
+                    <div className="flex gap-2">
+                        <Button type="button" variant="outline" size="sm" onClick={onCancel} className="flex-1 sm:flex-none">
+                            Cancel
+                        </Button>
+                        <Button type="submit" size="sm" disabled={isSubmitting || !content.trim()} className="flex-1 sm:flex-none">
+                            {isSubmitting ? (
+                                <>
+                                    <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                                    Posting...
+                                </>
+                            ) : (
+                                <>
+                                    <Send className="mr-2 h-3 w-3" />
+                                    Reply
+                                </>
+                            )}
+                        </Button>
+                    </div>
+                </div>
+            </form>
+        </Card>
+    )
+}
+
+// Reply Item Component
+function ReplyItem({
+    reply,
+    commentId,
+    onReplyUpdated,
+}: {
+    reply: Reply
+    commentId: string
+    onReplyUpdated: () => void
+}) {
+    const { data: session } = useSession()
+    const [isEditing, setIsEditing] = useState(false)
+    const [editContent, setEditContent] = useState(reply.content)
+    const [isUpdating, setIsUpdating] = useState(false)
+    const [isDeleting, setIsDeleting] = useState(false)
+    const [showMenu, setShowMenu] = useState(false)
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+    const [isAdmin, setIsAdmin] = useState(() => isAdminClient()) // Check admin status
+    const menuRef = useRef<HTMLDivElement>(null)
+
+    const isCurrentUser = session?.user?.email === reply.user.email
+    const canModify = isCurrentUser || (isAdmin && reply.user.email === "reply@blog.io.tech") // Admin can only edit their own admin comments
+
+    // Close menu when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+                setShowMenu(false)
+            }
+        }
+
+        if (showMenu) {
+            document.addEventListener('mousedown', handleClickOutside)
+            return () => {
+                document.removeEventListener('mousedown', handleClickOutside)
+            }
+        }
+    }, [showMenu])
+
+    // Check admin status
+    useEffect(() => {
+        setIsAdmin(isAdminClient())
+    }, [])
+
+    const handleEditClick = () => {
+        setIsEditing(true)
+        setEditContent(reply.content)
+        setShowMenu(false)
+    }
+
+    const handleEditCancel = () => {
+        setIsEditing(false)
+        setEditContent(reply.content)
+    }
+
+    const handleEditSave = async () => {
+        const saveToastId = toast.loading("Saving your reply...")
+        if (!editContent.trim()) {
+            toast.error("Reply cannot be empty", { id: saveToastId })
+            return
+        }
+
+        if (editContent.trim() === reply.content) {
+            setIsEditing(false)
+            return
+        }
+
+        setIsUpdating(true)
+
+        try {
+            const response = await fetch(`/api/comments/${commentId}/reply/${reply._id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    content: editContent.trim(),
+                }),
+            })
+
+            const data = await response.json()
+
+            if (!response.ok) {
+                throw new Error(data.error || "Failed to update reply")
+            }
+
+            toast.success("Reply updated successfully!", { id: saveToastId })
+            setIsEditing(false)
+            onReplyUpdated()
+
+        } catch (error) {
+            console.error("Error updating reply:", error)
+            toast.error(error instanceof Error ? error.message : "Failed to update reply", { id: saveToastId })
+        } finally {
+            setIsUpdating(false)
+        }
+    }
+
+    const handleDeleteClick = () => {
+        setShowDeleteDialog(true)
+        setShowMenu(false)
+    }
+
+    const handleConfirmDelete = async () => {
+        const deleteToastId = toast.loading("Deleting your reply...")
+        setIsDeleting(true)
+        setShowDeleteDialog(false)
+
+        try {
+            const response = await fetch(`/api/comments/${commentId}/reply/${reply._id}`, {
+                method: "DELETE",
+            })
+
+            const data = await response.json()
+
+            if (!response.ok) {
+                throw new Error(data.error || "Failed to delete reply")
+            }
+
+            toast.success("Reply deleted successfully!", { id: deleteToastId })
+            onReplyUpdated()
+
+        } catch (error) {
+            console.error("Error deleting reply:", error)
+            toast.error(error instanceof Error ? error.message : "Failed to delete reply", { id: deleteToastId })
+        } finally {
+            setIsDeleting(false)
+        }
+    }
+
+    return (
+        <>
+            <Card className="p-3 sm:p-4 border-border">
+                <div className="flex gap-2 sm:gap-3">
+                    <div className="flex-shrink-0">
+                        <div className="h-6 w-6 sm:h-8 sm:w-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center">
+                            <User className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
                         </div>
                     </div>
-
-                    {/* Content */}
                     <div className="flex-1 min-w-0">
-                        {/* Header */}
                         <div className="flex items-center gap-2 mb-2 flex-wrap">
-                            <span className="font-medium text-foreground">{comment.author}</span>
-                            {comment.badge && (
-                                <Badge
-                                    variant="outline"
-                                    className={cn(
-                                        "text-xs px-2 py-0",
-                                        comment.badge === "Author" && "border-primary/30 text-primary",
-                                        comment.badge === "Moderator" && "border-emerald-400/30 text-emerald-400",
-                                        comment.badge === "Verified" && "border-cyan-400/30 text-cyan-400",
-                                    )}
-                                >
-                                    {comment.badge}
+                            <span className="font-medium text-foreground text-xs sm:text-sm">{reply.user.name}</span>
+                            {isCurrentUser && (
+                                <Badge variant="outline" className="text-xs px-1 py-0 border-primary/30 text-primary">
+                                    You
                                 </Badge>
                             )}
-                            <span className="text-sm text-muted-foreground">{comment.timestamp}</span>
-                        </div>
-
-                        {/* Comment text */}
-                        <p className="text-foreground mb-3 leading-relaxed">{comment.content}</p>
-
-                        {/* Actions */}
-                        <div className="flex items-center gap-4">
-                            <button
-                                onClick={handleLike}
-                                className={cn(
-                                    "flex items-center gap-1.5 text-sm transition-colors group",
-                                    isLiked ? "text-red-500" : "text-muted-foreground hover:text-foreground",
-                                )}
-                            >
-                                <Heart
-                                    className={cn("h-4 w-4 transition-all", isLiked && "fill-current scale-110")}
-                                    strokeWidth={isLiked ? 0 : 2}
-                                />
-                                <span className="font-medium">{comment.likes + (isLiked ? 1 : 0)}</span>
-                            </button>
-
-                            <button
-                                onClick={() => onReply(comment.id)}
-                                className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                            >
-                                <Reply className="h-4 w-4" />
-                                <span>Reply</span>
-                            </button>
-
-                            {comment.replies && comment.replies.length > 0 && (
-                                <button
-                                    onClick={() => setIsExpanded(!isExpanded)}
-                                    className="text-sm text-primary hover:text-primary/80 transition-colors font-medium"
+                            {reply.user.email === "reply@blog.io.tech" && (
+                                <Badge
+                                    variant="outline"
+                                    className="text-xs px-1 py-0 border-amber-300 text-amber-600 dark:border-amber-800 dark:text-amber-400"
                                 >
-                                    {isExpanded ? "Hide" : "Show"} {comment.replies.length}{" "}
-                                    {comment.replies.length === 1 ? "reply" : "replies"}
-                                </button>
+                                    <Crown className="h-3 w-3 mr-1" />
+                                    Author
+                                </Badge>
+                            )}
+                            <span className="text-xs text-muted-foreground">
+                                {formatDistanceToNow(new Date(reply.createdAt), { addSuffix: true })}
+                            </span>
+                            {reply.contentUpdatedAt && new Date(reply.contentUpdatedAt).getTime() > new Date(reply.createdAt).getTime() + 1000 && (
+                                <span className="text-xs text-muted-foreground italic">(edited)</span>
                             )}
 
-                            <div className="relative ml-auto">
-                                <button
-                                    onClick={() => setShowMenu(!showMenu)}
-                                    className="p-1 text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-muted"
-                                >
-                                    <MoreVertical className="h-4 w-4" />
-                                </button>
+                            {/* Reply actions menu */}
+                            {canModify && (
+                                <div className="relative ml-auto" ref={menuRef}>
+                                    <button
+                                        onClick={() => setShowMenu(!showMenu)}
+                                        className="p-1 text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-muted"
+                                    >
+                                        <MoreVertical className="h-3 w-3" />
+                                    </button>
 
-                                <AnimatePresence>
-                                    {showMenu && (
-                                        <motion.div
-                                            initial={{ opacity: 0, scale: 0.95, y: -10 }}
-                                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                                            exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                                            className="absolute right-0 top-full mt-1 z-10 w-40 bg-card border-2 border-border rounded-lg shadow-lg overflow-hidden"
-                                        >
-                                            <button className="w-full px-3 py-2 text-sm text-left hover:bg-muted flex items-center gap-2 transition-colors">
-                                                <Flag className="h-4 w-4" />
-                                                Report
-                                            </button>
-                                            {comment.isAuthor && (
-                                                <>
-                                                    <button className="w-full px-3 py-2 text-sm text-left hover:bg-muted flex items-center gap-2 transition-colors">
-                                                        <Edit className="h-4 w-4" />
-                                                        Edit
-                                                    </button>
-                                                    <button className="w-full px-3 py-2 text-sm text-left hover:bg-red-500/10 text-red-500 flex items-center gap-2 transition-colors">
-                                                        <Trash2 className="h-4 w-4" />
-                                                        Delete
-                                                    </button>
-                                                </>
-                                            )}
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </div>
+                                    <AnimatePresence>
+                                        {showMenu && (
+                                            <motion.div
+                                                initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                                exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                                                className="absolute right-0 top-full mt-1 z-10 w-32 bg-card border-2 border-border rounded-lg shadow-lg overflow-hidden"
+                                            >
+                                                <button
+                                                    onClick={handleEditClick}
+                                                    disabled={isUpdating || isDeleting}
+                                                    className="w-full px-2 py-1.5 text-xs text-left hover:bg-muted flex items-center gap-2 transition-colors disabled:opacity-50"
+                                                >
+                                                    <Edit className="h-3 w-3" />
+                                                    Edit
+                                                </button>
+                                                <button
+                                                    onClick={handleDeleteClick}
+                                                    disabled={isUpdating || isDeleting}
+                                                    className="w-full px-2 py-1.5 text-xs text-left hover:bg-red-500/10 text-red-500 flex items-center gap-2 transition-colors disabled:opacity-50"
+                                                >
+                                                    {isDeleting ? (
+                                                        <Loader2 className="h-3 w-3 animate-spin" />
+                                                    ) : (
+                                                        <Trash2 className="h-3 w-3" />
+                                                    )}
+                                                    {isDeleting ? "Deleting..." : "Delete"}
+                                                </button>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
+                            )}
                         </div>
+
+                        {/* Reply content or edit form */}
+                        {isEditing ? (
+                            <div className="space-y-2">
+                                <textarea
+                                    value={editContent}
+                                    onChange={(e) => setEditContent(e.target.value)}
+                                    className="w-full min-h-[60px] px-2 py-1.5 border border-border rounded-md bg-background resize-none text-xs sm:text-sm"
+                                    maxLength={1000}
+                                    placeholder="Edit your reply..."
+                                />
+                                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                                    <span className="text-xs text-muted-foreground">{editContent.length}/1000</span>
+                                    <div className="flex gap-2">
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={handleEditCancel}
+                                            disabled={isUpdating}
+                                            className="text-xs h-7"
+                                        >
+                                            Cancel
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            size="sm"
+                                            onClick={handleEditSave}
+                                            disabled={isUpdating || !editContent.trim()}
+                                            className="text-xs h-7"
+                                        >
+                                            {isUpdating ? (
+                                                <>
+                                                    <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                                                    Saving...
+                                                </>
+                                            ) : (
+                                                "Save"
+                                            )}
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <p className="text-xs sm:text-sm text-foreground leading-relaxed whitespace-pre-wrap break-words">{reply.content}</p>
+                        )}
                     </div>
                 </div>
             </Card>
 
-            {/* Nested replies */}
-            <AnimatePresence>
-                {isExpanded && comment.replies && comment.replies.length > 0 && (
-                    <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="mt-4 space-y-4"
-                    >
-                        {comment.replies.map((reply) => (
-                            <CommentItem key={reply.id} comment={reply} onReply={onReply} onLike={onLike} level={level + 1} />
-                        ))}
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </motion.div>
+            {/* Delete confirmation dialog */}
+            <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+                <AlertDialogContent className="border-none">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Reply</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Are you sure you want to delete this reply? This action cannot be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleConfirmDelete}
+                            disabled={isDeleting}
+                            className="bg-red-600 hover:bg-red-700 focus:ring-red-600 text-white"
+                        >
+                            {isDeleting ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Deleting...
+                                </>
+                            ) : (
+                                "Delete Reply"
+                            )}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        </>
     )
 }
 
-export function CommentSection({ postSlug, className }: CommentSectionProps) {
-    const [comments, setComments] = useState<Comment[]>(mockComments)
-    const [newComment, setNewComment] = useState("")
-    const [replyingTo, setReplyingTo] = useState<string | null>(null)
-    const [sortBy, setSortBy] = useState<"newest" | "popular">("popular")
-    const [isSubmitting, setIsSubmitting] = useState(false)
+function CommentItem({
+    comment,
+    postAuthor,
+    onReply,
+    onRefresh,
+    level = 0,
+}: {
+    comment: Comment
+    postAuthor?: string
+    onReply: (commentId: string) => void
+    onRefresh: () => void
+    level?: number
+}) {
+    const { data: session } = useSession()
+    const [showMenu, setShowMenu] = useState(false)
+    const [isExpanded, setIsExpanded] = useState(true)
+    const [showReplyForm, setShowReplyForm] = useState(false)
+    const [isEditing, setIsEditing] = useState(false)
+    const [editContent, setEditContent] = useState(comment.content)
+    const [isUpdating, setIsUpdating] = useState(false)
+    const [isDeleting, setIsDeleting] = useState(false)
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+    const [isAdmin, setIsAdmin] = useState(() => isAdminClient()) // Check admin status
+    const menuRef = useRef<HTMLDivElement>(null)
 
-    const handleSubmitComment = async (e: React.FormEvent) => {
-        e.preventDefault()
-        if (!newComment.trim()) return
+    const isCurrentUser = session?.user?.email === comment.user.email
+    const canModify = isCurrentUser || (isAdmin && comment.user.email === "reply@blog.io.tech") // Admin can only edit their own admin comments
+    const formattedDate = formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })
 
-        setIsSubmitting(true)
+    // Close menu when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+                setShowMenu(false)
+            }
+        }
 
-        // Simulate API call
-        setTimeout(() => {
-            const comment: Comment = {
-                id: Date.now().toString(),
-                author: "You",
-                content: newComment,
-                timestamp: "Just now",
-                likes: 0,
-                replies: [],
+        if (showMenu) {
+            document.addEventListener('mousedown', handleClickOutside)
+            return () => {
+                document.removeEventListener('mousedown', handleClickOutside)
+            }
+        }
+    }, [showMenu])
+
+    // Check admin status
+    useEffect(() => {
+        setIsAdmin(isAdminClient())
+    }, [])
+
+    const handleReplyClick = () => {
+        if (!session && !isAdmin) {
+            toast.error("Please sign in to reply")
+            return
+        }
+        setShowReplyForm(true)
+    }
+
+    const handleReplyAdded = () => {
+        onRefresh()
+        setShowReplyForm(false)
+    }
+
+    const handleEditClick = () => {
+        setIsEditing(true)
+        setEditContent(comment.content)
+        setShowMenu(false)
+    }
+
+    const handleEditCancel = () => {
+        setIsEditing(false)
+        setEditContent(comment.content)
+    }
+
+    const handleEditSave = async () => {
+        const saveToastId = toast.loading("Saving your comment...")
+        if (!editContent.trim()) {
+            toast.error("Comment cannot be empty", { id: saveToastId })
+            return
+        }
+
+        if (editContent.trim() === comment.content) {
+            setIsEditing(false)
+            return
+        }
+
+        setIsUpdating(true)
+
+        try {
+            const response = await fetch(`/api/comments/${comment._id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    content: editContent.trim(),
+                }),
+            })
+
+            const data = await response.json()
+
+            if (!response.ok) {
+                throw new Error(data.error || "Failed to update comment")
             }
 
-            setComments([comment, ...comments])
-            setNewComment("")
-            setIsSubmitting(false)
-        }, 500)
+            toast.success("Comment updated successfully!", { id: saveToastId })
+            setIsEditing(false)
+            onRefresh()
+
+        } catch (error) {
+            console.error("Error updating comment:", error)
+            toast.error(error instanceof Error ? error.message : "Failed to update comment", { id: saveToastId })
+        } finally {
+            setIsUpdating(false)
+        }
+    }
+
+    const handleDeleteClick = () => {
+        setShowDeleteDialog(true)
+        setShowMenu(false)
+    }
+
+    const handleConfirmDelete = async () => {
+        const deleteToastId = toast.loading("Deleting your comment...")
+        setIsDeleting(true)
+        setShowDeleteDialog(false)
+
+        try {
+            const response = await fetch(`/api/comments/${comment._id}`, {
+                method: "DELETE",
+            })
+
+            const data = await response.json()
+
+            if (!response.ok) {
+                throw new Error(data.error || "Failed to delete comment")
+            }
+
+            toast.success("Comment deleted successfully!", { id: deleteToastId })
+            onRefresh()
+
+        } catch (error) {
+            console.error("Error deleting comment:", error)
+            toast.error(error instanceof Error ? error.message : "Failed to delete comment", { id: deleteToastId })
+        } finally {
+            setIsDeleting(false)
+        }
+    }
+
+    return (
+        <>
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={cn("relative", level > 0 && "ml-4 sm:ml-8 md:ml-12")}
+            >
+                {/* Connection line for replies */}
+                {level > 0 && (
+                    <div className="absolute -left-4 sm:-left-8 md:-left-12 top-0 bottom-0 w-px bg-border">
+                        <div className="absolute top-6 -left-2 w-3 sm:w-4 h-px bg-border" />
+                    </div>
+                )}
+
+                <Card
+                    className={cn(
+                        "p-3 sm:p-4 border-border hover:border-primary/30 transition-colors",
+                        isCurrentUser && "bg-primary/5 border-primary/20",
+                    )}
+                >
+                    <div className="flex gap-2 sm:gap-3">
+                        {/* Avatar */}
+                        <div className="flex-shrink-0">
+                            <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-primary/10 border-2 border-primary/20 flex items-center justify-center">
+                                <User className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                            </div>
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                            {/* Header */}
+                            <div className="flex items-start gap-2 mb-2 flex-wrap">
+                                <span className="font-medium text-foreground text-sm sm:text-base">{comment.user.name}</span>
+                                {isCurrentUser && (
+                                    <Badge
+                                        variant="outline"
+                                        className="text-xs px-1.5 sm:px-2 py-0 border-primary/30 text-primary"
+                                    >
+                                        You
+                                    </Badge>
+                                )}
+                                {comment.user.email === "reply@blog.io.tech" && (
+                                    <Badge
+                                        variant="outline"
+                                        className="text-xs px-1.5 sm:px-2 py-0 border-amber-300 text-amber-600 dark:border-amber-800 dark:text-amber-400"
+                                    >
+                                        <Crown className="h-3 w-3 mr-1" />
+                                        Author
+                                    </Badge>
+                                )}
+                                <span className="text-xs sm:text-sm text-muted-foreground">{formattedDate}</span>
+                                {comment.contentUpdatedAt && new Date(comment.contentUpdatedAt).getTime() > new Date(comment.createdAt).getTime() + 1000 && (
+                                    <span className="text-xs text-muted-foreground italic">(edited)</span>
+                                )}
+                            </div>
+
+                            {/* Comment text or edit form */}
+                            {isEditing ? (
+                                <div className="space-y-3">
+                                    <textarea
+                                        value={editContent}
+                                        onChange={(e) => setEditContent(e.target.value)}
+                                        className="w-full min-h-[80px] px-3 py-2 border border-border rounded-md bg-background resize-none text-sm"
+                                        maxLength={2000}
+                                        placeholder="Edit your comment..."
+                                    />
+                                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                                        <span className="text-xs text-muted-foreground">{editContent.length}/2000</span>
+                                        <div className="flex gap-2">
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={handleEditCancel}
+                                                disabled={isUpdating}
+                                                className="flex-1 sm:flex-none"
+                                            >
+                                                Cancel
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                size="sm"
+                                                onClick={handleEditSave}
+                                                disabled={isUpdating || !editContent.trim()}
+                                                className="flex-1 sm:flex-none"
+                                            >
+                                                {isUpdating ? (
+                                                    <>
+                                                        <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                                                        Saving...
+                                                    </>
+                                                ) : (
+                                                    "Save"
+                                                )}
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <p className="text-sm sm:text-base text-foreground mb-3 leading-relaxed whitespace-pre-wrap break-words">{comment.content}</p>
+                            )}
+
+                            {/* Actions */}
+                            {!isEditing && (
+                                <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
+                                    {(session || isAdmin) ? (
+                                        <button
+                                            onClick={handleReplyClick}
+                                            className="flex items-center gap-1.5 text-xs sm:text-sm text-muted-foreground hover:text-foreground transition-colors"
+                                        >
+                                            <Reply className="h-3 w-3 sm:h-4 sm:w-4" />
+                                            <span>Reply</span>
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={() => toast.info("Please sign in to reply to comments")}
+                                            className="flex items-center gap-1.5 text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors"
+                                        >
+                                            <Reply className="h-3 w-3 sm:h-4 sm:w-4" />
+                                            <span>Sign in to Reply</span>
+                                        </button>
+                                    )}
+
+                                    {comment.replies && comment.replies.length > 0 && (
+                                        <button
+                                            onClick={() => setIsExpanded(!isExpanded)}
+                                            className="text-xs sm:text-sm text-primary hover:text-primary/80 transition-colors font-medium"
+                                        >
+                                            {isExpanded ? "Hide" : "Show"} {comment.replies.length}{" "}
+                                            {comment.replies.length === 1 ? "reply" : "replies"}
+                                        </button>
+                                    )}
+
+                                    <div className="relative ml-auto" ref={menuRef}>
+                                        <button
+                                            onClick={() => setShowMenu(!showMenu)}
+                                            className="p-1 text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-muted"
+                                        >
+                                            <MoreVertical className="h-3 w-3 sm:h-4 sm:w-4" />
+                                        </button>
+
+                                        <AnimatePresence>
+                                            {showMenu && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                                                    className="absolute right-0 top-full mt-1 z-10 w-36 sm:w-40 bg-card border-2 border-border rounded-lg shadow-lg overflow-hidden"
+                                                >
+                                                    <button className="w-full px-3 py-2 text-xs sm:text-sm text-left hover:bg-muted flex items-center gap-2 transition-colors">
+                                                        <Flag className="h-3 w-3 sm:h-4 sm:w-4" />
+                                                        Report
+                                                    </button>
+                                                    {canModify && (
+                                                        <>
+                                                            <button
+                                                                onClick={handleEditClick}
+                                                                disabled={isUpdating || isDeleting}
+                                                                className="w-full px-3 py-2 text-xs sm:text-sm text-left hover:bg-muted flex items-center gap-2 transition-colors disabled:opacity-50"
+                                                            >
+                                                                <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
+                                                                Edit
+                                                            </button>
+                                                            <button
+                                                                onClick={handleDeleteClick}
+                                                                disabled={isUpdating || isDeleting}
+                                                                className="w-full px-3 py-2 text-xs sm:text-sm text-left hover:bg-red-500/10 text-red-500 flex items-center gap-2 transition-colors disabled:opacity-50"
+                                                            >
+                                                                {isDeleting ? (
+                                                                    <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+                                                                ) : (
+                                                                    <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                                                                )}
+                                                                {isDeleting ? "Deleting..." : "Delete"}
+                                                            </button>
+                                                        </>
+                                                    )}
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </Card>
+
+                {/* Reply Form */}
+                {showReplyForm && (
+                    <ReplyForm
+                        commentId={comment._id}
+                        postAuthor={postAuthor}
+                        onReplyAdded={handleReplyAdded}
+                        onCancel={() => setShowReplyForm(false)}
+                    />
+                )}
+
+                {/* Nested replies */}
+                <AnimatePresence>
+                    {isExpanded && comment.replies && comment.replies.length > 0 && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="mt-4 space-y-4"
+                        >
+                            {comment.replies.map((reply) => (
+                                <div key={reply._id} className={cn("relative", "ml-4 sm:ml-8 md:ml-12")}>
+                                    <div className="absolute -left-4 sm:-left-8 md:-left-12 top-0 bottom-0 w-px bg-border">
+                                        <div className="absolute top-6 -left-2 w-3 sm:w-4 h-px bg-border" />
+                                    </div>
+                                    <ReplyItem
+                                        reply={reply}
+                                        commentId={comment._id}
+                                        onReplyUpdated={onRefresh}
+                                    />
+                                </div>
+                            ))}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </motion.div>
+
+            {/* Delete confirmation dialog */}
+            <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+                <AlertDialogContent className="border-none">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Comment</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Are you sure you want to delete this comment? This action cannot be undone and will also delete all replies to this comment.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleConfirmDelete}
+                            disabled={isDeleting}
+                            className="bg-red-600 hover:bg-red-700 focus:ring-red-600 text-white"
+                        >
+                            {isDeleting ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Deleting...
+                                </>
+                            ) : (
+                                "Delete Comment"
+                            )}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        </>
+    )
+}
+
+export function CommentSection({ postSlug, postAuthor, className }: CommentSectionProps) {
+    const { data: session } = useSession()
+    const [comments, setComments] = useState<Comment[]>([])
+    const [loading, setLoading] = useState(true)
+    const [stats, setStats] = useState({ totalComments: 0, totalReplies: 0, totalInteractions: 0 })
+    const [sortBy, setSortBy] = useState<"newest" | "popular">("newest")
+
+    const fetchComments = async () => {
+        try {
+            setLoading(true)
+            const response = await fetch(`/api/comments?postSlug=${encodeURIComponent(postSlug)}`)
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch comments')
+            }
+
+            const data = await response.json()
+            setComments(data.comments || [])
+            setStats(data.stats || { totalComments: 0, totalReplies: 0, totalInteractions: 0 })
+        } catch (error) {
+            console.error('Error fetching comments:', error)
+            toast.error('Failed to load comments')
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    useEffect(() => {
+        fetchComments()
+    }, [postSlug])
+
+    const handleCommentAdded = (newComment: Comment) => {
+        setComments(prev => [newComment, ...prev])
+        setStats(prev => ({
+            totalComments: prev.totalComments + 1,
+            totalReplies: prev.totalReplies,
+            totalInteractions: prev.totalInteractions + 1
+        }))
     }
 
     const handleReply = (commentId: string) => {
-        setReplyingTo(commentId)
-        // Focus on comment input
-        document.getElementById("comment-input")?.focus()
-    }
-
-    const handleLike = (commentId: string) => {
-        // Handle like logic
-        console.log("Liked comment:", commentId)
+        // This is handled by the ReplyForm component
+        console.log("Reply to comment:", commentId)
     }
 
     const sortedComments = [...comments].sort((a, b) => {
         if (sortBy === "popular") {
-            return b.likes - a.likes
+            // Sort by total engagement (replies count)
+            const aEngagement = a.replies.length
+            const bEngagement = b.replies.length
+            return bEngagement - aEngagement
         }
-        return 0 // newest is default order
+        // Default: newest first
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     })
+
+    if (loading) {
+        return (
+            <div className={cn("space-y-6", className)}>
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-full bg-primary/10 border border-primary/20">
+                            <MessageSquare className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                            <h2 className="text-2xl font-bold font-mono">Comments</h2>
+                            <div className="flex items-center gap-2">
+                                <div className="w-16 h-4 bg-muted animate-pulse rounded" />
+                                <span className="text-sm text-muted-foreground">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="space-y-4">
+                    {[1, 2, 3].map((i) => (
+                        <Card key={i} className="p-4">
+                            <div className="flex gap-3">
+                                <div className="w-10 h-10 bg-muted animate-pulse rounded-full" />
+                                <div className="flex-1 space-y-2">
+                                    <div className="w-32 h-4 bg-muted animate-pulse rounded" />
+                                    <div className="w-full h-16 bg-muted animate-pulse rounded" />
+                                </div>
+                            </div>
+                        </Card>
+                    ))}
+                </div>
+            </div>
+        )
+    }
 
     return (
         <div className={cn("space-y-6", className)}>
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-3">
                     <div className="p-2 rounded-full bg-primary/10 border border-primary/20">
                         <MessageSquare className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                        <h2 className="text-2xl font-bold font-mono">Comments</h2>
-                        <p className="text-sm text-muted-foreground">{comments.length} thoughts from the community</p>
+                        <h2 className="text-xl sm:text-2xl font-bold font-mono">Comments</h2>
+                        <div className="flex flex-wrap items-center gap-2">
+                            <p className="text-sm text-muted-foreground">
+                                {stats.totalInteractions} {stats.totalInteractions === 1 ? 'interaction' : 'interactions'} from the community
+                            </p>
+                            {session?.user ? (
+                                <Badge variant="secondary" className="text-xs">
+                                    <User className="h-3 w-3 mr-1" />
+                                    Signed in
+                                </Badge>
+                            ) : (
+                                <Badge variant="outline" className="text-xs border-yellow-200 text-yellow-700 dark:border-yellow-800 dark:text-yellow-300">
+                                    Sign in to comment
+                                </Badge>
+                            )}
+                        </div>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground hidden sm:inline">Sort by:</span>
-                    <div className="flex rounded-lg border border-border overflow-hidden bg-card">
-                        <button
-                            onClick={() => setSortBy("popular")}
-                            className={cn(
-                                "px-3 py-1.5 text-sm font-medium transition-colors",
-                                sortBy === "popular" ? "bg-primary text-primary-foreground" : "hover:bg-muted",
-                            )}
-                        >
-                            Popular
-                        </button>
-                        <button
-                            onClick={() => setSortBy("newest")}
-                            className={cn(
-                                "px-3 py-1.5 text-sm font-medium transition-colors",
-                                sortBy === "newest" ? "bg-primary text-primary-foreground" : "hover:bg-muted",
-                            )}
-                        >
-                            Newest
-                        </button>
+                {comments.length > 0 && (
+                    <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground hidden sm:inline">Sort by:</span>
+                        <div className="flex rounded-lg border border-border overflow-hidden bg-card w-full sm:w-auto">
+                            <button
+                                onClick={() => setSortBy("newest")}
+                                className={cn(
+                                    "px-3 py-1.5 text-sm font-medium transition-colors flex-1 sm:flex-none",
+                                    sortBy === "newest" ? "bg-primary text-primary-foreground" : "hover:bg-muted",
+                                )}
+                            >
+                                Newest
+                            </button>
+                            <button
+                                onClick={() => setSortBy("popular")}
+                                className={cn(
+                                    "px-3 py-1.5 text-sm font-medium transition-colors flex-1 sm:flex-none",
+                                    sortBy === "popular" ? "bg-primary text-primary-foreground" : "hover:bg-muted",
+                                )}
+                            >
+                                Popular
+                            </button>
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
 
-            {/* Comment Input */}
-            <Card className="p-4 border-2 border-primary/20 bg-gradient-to-br from-card to-card/80">
-                <form onSubmit={handleSubmitComment} className="space-y-4">
-                    <div className="flex gap-3">
-                        <div className="flex-shrink-0">
-                            <div className="h-10 w-10 rounded-full bg-primary/10 border-2 border-primary/20 flex items-center justify-center">
-                                <User className="h-5 w-5 text-primary" />
-                            </div>
-                        </div>
-                        <div className="flex-1">
-                            <textarea
-                                id="comment-input"
-                                value={newComment}
-                                onChange={(e) => setNewComment(e.target.value)}
-                                placeholder="Share your thoughts on this post..."
-                                className="w-full min-h-[100px] px-4 py-3 rounded-lg border-2 border-border bg-background text-foreground resize-none focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-                            />
-                        </div>
-                    </div>
-
-                    {replyingTo && (
-                        <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: "auto" }}
-                            className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-lg"
-                        >
-                            <Reply className="h-4 w-4 text-primary" />
-                            <span className="text-sm text-muted-foreground">
-                                Replying to <span className="text-primary font-medium">comment</span>
-                            </span>
-                            <button
-                                onClick={() => setReplyingTo(null)}
-                                className="ml-auto text-muted-foreground hover:text-foreground"
-                            >
-                                Cancel
-                            </button>
-                        </motion.div>
-                    )}
-
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                            <Code className="h-3 w-3" />
-                            <span>Markdown supported</span>
-                        </div>
-                        <Button
-                            type="submit"
-                            disabled={!newComment.trim() || isSubmitting}
-                            className="bg-primary text-primary-foreground hover:bg-primary/90"
-                        >
-                            {isSubmitting ? (
-                                <>
-                                    <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
-                                    Posting...
-                                </>
-                            ) : (
-                                <>
-                                    <Send className="h-4 w-4 mr-2" />
-                                    Post Comment
-                                </>
-                            )}
-                        </Button>
-                    </div>
-                </form>
-            </Card>
+            {/* Comment Form */}
+            <CommentForm
+                postSlug={postSlug}
+                postAuthor={postAuthor}
+                onCommentAdded={handleCommentAdded}
+                placeholder="Share your thoughts on this post..."
+                buttonText="Post Comment"
+            />
 
             {/* Comments List */}
-            <div className="space-y-4">
-                <AnimatePresence>
-                    {sortedComments.map((comment) => (
-                        <CommentItem key={comment.id} comment={comment} onReply={handleReply} onLike={handleLike} />
-                    ))}
-                </AnimatePresence>
-            </div>
-
-            {/* Load More */}
-            {comments.length > 0 && (
-                <div className="text-center pt-4">
-                    <Button
-                        variant="outline"
-                        className="border-primary/20 hover:bg-primary/10 hover:border-primary/30 bg-transparent"
-                    >
-                        Load More Comments
-                    </Button>
+            {comments.length > 0 ? (
+                <div className="space-y-4">
+                    <AnimatePresence>
+                        {sortedComments.map((comment) => (
+                            <CommentItem
+                                key={comment._id}
+                                comment={comment}
+                                postAuthor={postAuthor}
+                                onReply={handleReply}
+                                onRefresh={fetchComments}
+                            />
+                        ))}
+                    </AnimatePresence>
                 </div>
-            )}
-
-            {/* Empty State */}
-            {comments.length === 0 && (
+            ) : (
                 <Card className="p-12 text-center border-dashed border-2 border-border">
                     <div className="inline-flex p-4 rounded-full bg-primary/10 border border-primary/20 mb-4">
                         <MessageSquare className="h-8 w-8 text-primary" />
