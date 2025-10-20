@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Skeleton } from "@/components/ui/skeleton"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { MessageSquare, Trash2, Reply, Send, User, Crown, Loader2, Clock } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
@@ -169,7 +170,7 @@ export function AdminCommentManager({ isOpen, onClose, postSlug }: AdminCommentM
 
     return (
         <Sheet open={isOpen} onOpenChange={onClose}>
-            <SheetContent className="w-full sm:max-w-2xl">
+            <SheetContent className="w-full sm:max-w-2xl border-none">
                 <SheetHeader>
                     <SheetTitle className="flex items-center gap-2">
                         <MessageSquare className="h-5 w-5" />
@@ -182,10 +183,75 @@ export function AdminCommentManager({ isOpen, onClose, postSlug }: AdminCommentM
 
                 <div className="mt-6">
                     {loading ? (
-                        <div className="flex items-center justify-center p-8">
-                            <Loader2 className="h-6 w-6 animate-spin" />
-                            <span className="ml-2">Loading comments...</span>
-                        </div>
+                        <ScrollArea className="h-[calc(100vh-200px)]">
+                            <div className="space-y-4">
+                                {/* Comment Skeleton Loader */}
+                                {Array.from({ length: 3 }).map((_, index) => (
+                                    <Card key={index} className="border-border">
+                                        <CardHeader className="pb-3">
+                                            <div className="flex items-start justify-between">
+                                                <div className="flex items-center gap-2">
+                                                    <Skeleton className="h-8 w-8 rounded-full" />
+                                                    <div className="space-y-1">
+                                                        <div className="flex items-center gap-2">
+                                                            <Skeleton className="h-4 w-20" />
+                                                            <Skeleton className="h-4 w-12 rounded-full" />
+                                                        </div>
+                                                        <div className="flex items-center gap-2">
+                                                            <Skeleton className="h-3 w-3 rounded-full" />
+                                                            <Skeleton className="h-3 w-24" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="flex gap-1">
+                                                    <Skeleton className="h-7 w-16" />
+                                                    <Skeleton className="h-7 w-7" />
+                                                </div>
+                                            </div>
+                                        </CardHeader>
+                                        <CardContent className="pt-0">
+                                            <div className="space-y-2 mb-3">
+                                                <Skeleton className="h-4 w-full" />
+                                                <Skeleton className="h-4 w-3/4" />
+                                                <Skeleton className="h-4 w-1/2" />
+                                            </div>
+
+                                            {/* Reply Skeleton (for some comments) */}
+                                            {index < 2 && (
+                                                <div className="mt-4 space-y-3">
+                                                    <Separator />
+                                                    <Skeleton className="h-3 w-16" />
+                                                    <Card className="ml-4 bg-muted/20">
+                                                        <CardContent className="p-3">
+                                                            <div className="flex items-start justify-between mb-2">
+                                                                <div className="flex items-center gap-2">
+                                                                    <Skeleton className="h-6 w-6 rounded-full" />
+                                                                    <div className="space-y-1">
+                                                                        <div className="flex items-center gap-2">
+                                                                            <Skeleton className="h-3 w-16" />
+                                                                            <Skeleton className="h-3 w-10 rounded-full" />
+                                                                        </div>
+                                                                        <div className="flex items-center gap-2">
+                                                                            <Skeleton className="h-3 w-3 rounded-full" />
+                                                                            <Skeleton className="h-3 w-20" />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <Skeleton className="h-6 w-6" />
+                                                            </div>
+                                                            <div className="space-y-1">
+                                                                <Skeleton className="h-3 w-full" />
+                                                                <Skeleton className="h-3 w-2/3" />
+                                                            </div>
+                                                        </CardContent>
+                                                    </Card>
+                                                </div>
+                                            )}
+                                        </CardContent>
+                                    </Card>
+                                ))}
+                            </div>
+                        </ScrollArea>
                     ) : comments.length === 0 ? (
                         <div className="text-center py-8">
                             <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />

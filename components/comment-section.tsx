@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Card } from "./ui-tailwind/card"
 import { Button } from "./ui-tailwind/button"
 import { Badge } from "./ui-tailwind/badge"
+import { Skeleton } from "./ui/skeleton"
 import { MessageSquare, Reply, MoreVertical, Flag, Edit, Trash2, Send, User, Heart, Code, Loader2, Crown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { CommentForm } from "./comment-form"
@@ -1016,31 +1017,109 @@ export function CommentSection({ postSlug, postAuthor, className }: CommentSecti
     if (loading) {
         return (
             <div className={cn("space-y-6", className)}>
-                <div className="flex items-center justify-between">
+                {/* Header Skeleton */}
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-3">
                         <div className="p-2 rounded-full bg-primary/10 border border-primary/20">
                             <MessageSquare className="h-5 w-5 text-primary" />
                         </div>
                         <div>
-                            <h2 className="text-2xl font-bold font-mono">Comments</h2>
-                            <div className="flex items-center gap-2">
-                                <div className="w-16 h-4 bg-muted animate-pulse rounded" />
-                                <span className="text-sm text-muted-foreground">Loading...</span>
+                            <h2 className="text-xl sm:text-2xl font-bold font-mono">Comments</h2>
+                            <div className="flex flex-wrap items-center gap-2">
+                                <Skeleton className="h-4 w-32" />
+                                <Skeleton className="h-5 w-16 rounded-full" />
                             </div>
                         </div>
                     </div>
+                    <div className="flex items-center gap-2">
+                        <Skeleton className="h-4 w-16 hidden sm:inline-block" />
+                        <Skeleton className="h-8 w-24 rounded-lg" />
+                    </div>
                 </div>
+
+                {/* Comment Form Skeleton */}
+                <Card className="p-4 border-primary/20">
+                    <div className="space-y-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <Skeleton className="h-9 w-full" />
+                            <Skeleton className="h-9 w-full" />
+                        </div>
+                        <Skeleton className="h-24 w-full" />
+                        <div className="flex justify-between items-center">
+                            <Skeleton className="h-4 w-12" />
+                            <Skeleton className="h-9 w-32" />
+                        </div>
+                    </div>
+                </Card>
+
+                {/* Comments Skeleton */}
                 <div className="space-y-4">
-                    {[1, 2, 3].map((i) => (
-                        <Card key={i} className="p-4">
-                            <div className="flex gap-3">
-                                <div className="w-10 h-10 bg-muted animate-pulse rounded-full" />
-                                <div className="flex-1 space-y-2">
-                                    <div className="w-32 h-4 bg-muted animate-pulse rounded" />
-                                    <div className="w-full h-16 bg-muted animate-pulse rounded" />
+                    {Array.from({ length: 4 }).map((_, index) => (
+                        <motion.div
+                            key={index}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                        >
+                            <Card className="p-3 sm:p-4 border-border">
+                                <div className="flex gap-2 sm:gap-3">
+                                    {/* Avatar Skeleton */}
+                                    <div className="flex-shrink-0">
+                                        <Skeleton className="h-8 w-8 sm:h-10 sm:w-10 rounded-full" />
+                                    </div>
+
+                                    {/* Content Skeleton */}
+                                    <div className="flex-1 min-w-0">
+                                        {/* Header Skeleton */}
+                                        <div className="flex items-start gap-2 mb-2 flex-wrap">
+                                            <Skeleton className="h-4 sm:h-5 w-24" />
+                                            <Skeleton className="h-4 w-12 rounded-full" />
+                                            <Skeleton className="h-3 sm:h-4 w-20" />
+                                            <Skeleton className="h-3 w-12 ml-auto" />
+                                        </div>
+
+                                        {/* Comment Content Skeleton */}
+                                        <div className="space-y-2 mb-3">
+                                            <Skeleton className="h-4 w-full" />
+                                            <Skeleton className="h-4 w-5/6" />
+                                            <Skeleton className="h-4 w-3/4" />
+                                        </div>
+
+                                        {/* Actions Skeleton */}
+                                        <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
+                                            <Skeleton className="h-4 w-12" />
+                                            {index < 2 && <Skeleton className="h-4 w-16" />}
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </Card>
+                            </Card>
+
+                            {/* Reply Skeleton (for some comments) */}
+                            {index < 2 && (
+                                <div className="mt-4 ml-4 sm:ml-8 md:ml-12 space-y-3 relative">
+                                    <div className="absolute -left-4 sm:-left-8 md:-left-12 top-0 bottom-0 w-px bg-border">
+                                        <div className="absolute top-6 -left-2 w-3 sm:w-4 h-px bg-border" />
+                                    </div>
+                                    <Card className="p-3 border-border bg-muted/20">
+                                        <div className="flex gap-2">
+                                            <Skeleton className="h-6 w-6 rounded-full flex-shrink-0" />
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <Skeleton className="h-3 w-20" />
+                                                    <Skeleton className="h-3 w-10 rounded-full" />
+                                                    <Skeleton className="h-3 w-16" />
+                                                    <Skeleton className="h-3 w-3 ml-auto" />
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <Skeleton className="h-3 w-full" />
+                                                    <Skeleton className="h-3 w-2/3" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Card>
+                                </div>
+                            )}
+                        </motion.div>
                     ))}
                 </div>
             </div>
