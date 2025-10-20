@@ -161,24 +161,37 @@ export default function AboutPage() {
         {/* Featured Projects Section */}
         <div className="mt-16">
           <h2 className="text-2xl font-bold font-mono mb-6">Featured Projects</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {[1, 2, 3, 4].map((i) => (
-              <Card
-                key={i}
-                className="p-6 border-2 border-primary/20 hover:border-primary/40 transition-all duration-200 hover:shadow-lg dark:hover:shadow-[0_0_15px_rgba(0,240,255,0.15)]"
-              >
-                <h3 className="text-xl font-mono font-bold mb-2">Project {i}</h3>
-                <p className="text-muted-foreground mb-4">
-                  A scalable, distributed system for processing real-time data streams with sub-millisecond latency.
-                </p>
-                <div className="flex gap-2">
-                  <Badge>React</Badge>
-                  <Badge>Node.js</Badge>
-                  <Badge>AWS</Badge>
-                </div>
-              </Card>
-            ))}
-          </div>
+          <Card className="p-6 bg-gradient-to-br from-background to-background/80 backdrop-blur-sm">
+            <div className="space-y-4">
+              <p className="text-muted-foreground text-center">
+                Explore my latest projects and technical work
+              </p>
+              <div className="w-full bg-background/50 rounded-lg overflow-hidden border border-primary/20">
+                <iframe
+                  src="https://www.isaiahozadhe.tech/#projects"
+                  width="100%"
+                  height="600"
+                  className="border-0"
+                  title="Featured Projects from Portfolio"
+                  loading="lazy"
+                  sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                />
+              </div>
+              <div className="text-center pt-4">
+                <Button
+                  asChild
+                  variant="outline"
+                  className="border-primary/20 hover:bg-primary/10 hover:border-primary/30"
+                >
+                  <Link href="https://www.isaiahozadhe.tech/#projects" target="_blank">
+                    <Globe className="h-4 w-4 mr-2" />
+                    View Full Portfolio
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          </Card>
         </div>
 
         {/* Call to Action */}
