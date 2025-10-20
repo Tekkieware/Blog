@@ -13,11 +13,11 @@ const updateCommentSchema = z.object({
 })
 
 // GET - Get a single comment by ID
-export async function GET(request: NextRequest, { params }: { params: { commentId: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ commentId: string }> }) {
     try {
         await dbConnect()
 
-        const { commentId } = params
+        const { commentId } = await params
 
         // Validate commentId
         if (!mongoose.Types.ObjectId.isValid(commentId)) {
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest, { params }: { params: { commentI
 }
 
 // PUT - Update a comment
-export async function PUT(request: NextRequest, { params }: { params: { commentId: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ commentId: string }> }) {
     try {
         const session = await auth()
         const isAdminUser = isAdmin(request)
@@ -50,7 +50,7 @@ export async function PUT(request: NextRequest, { params }: { params: { commentI
 
         await dbConnect()
 
-        const { commentId } = params
+        const { commentId } = await params
 
         // Validate commentId
         if (!mongoose.Types.ObjectId.isValid(commentId)) {
@@ -104,7 +104,7 @@ export async function PUT(request: NextRequest, { params }: { params: { commentI
 }
 
 // DELETE - Delete a comment
-export async function DELETE(request: NextRequest, { params }: { params: { commentId: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ commentId: string }> }) {
     try {
         const session = await auth()
         const isAdminUser = isAdmin(request)
@@ -116,7 +116,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { comme
 
         await dbConnect()
 
-        const { commentId } = params
+        const { commentId } = await params
 
         // Validate commentId
         if (!mongoose.Types.ObjectId.isValid(commentId)) {

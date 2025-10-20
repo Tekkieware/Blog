@@ -15,7 +15,7 @@ const updateReplySchema = z.object({
 // PUT - Update a reply
 export async function PUT(
     request: NextRequest,
-    { params }: { params: { commentId: string, replyId: string } }
+    { params }: { params: Promise<{ commentId: string, replyId: string }> }
 ) {
     try {
         const session = await auth()
@@ -28,7 +28,7 @@ export async function PUT(
 
         await dbConnect()
 
-        const { commentId, replyId } = params
+        const { commentId, replyId } = await params
 
         // Validate IDs
         if (!mongoose.Types.ObjectId.isValid(commentId) || !mongoose.Types.ObjectId.isValid(replyId)) {
@@ -95,7 +95,7 @@ export async function PUT(
 // DELETE - Delete a reply
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { commentId: string, replyId: string } }
+    { params }: { params: Promise<{ commentId: string, replyId: string }> }
 ) {
     try {
         const session = await auth()
@@ -108,7 +108,7 @@ export async function DELETE(
 
         await dbConnect()
 
-        const { commentId, replyId } = params
+        const { commentId, replyId } = await params
 
         // Validate IDs
         if (!mongoose.Types.ObjectId.isValid(commentId) || !mongoose.Types.ObjectId.isValid(replyId)) {

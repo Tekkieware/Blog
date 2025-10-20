@@ -2,10 +2,11 @@ import dbConnect from "@/lib/db";
 import Post from "@/models/post";
 import { NextResponse } from "next/server";
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
     await dbConnect();
     try {
-        const post = await Post.findById(params.id);
+        const { id } = await params;
+        const post = await Post.findById(id);
         if (!post) {
             return NextResponse.json({ message: "Post not found" }, { status: 404 });
         }
@@ -15,20 +16,21 @@ export async function GET(request: Request, { params }: { params: { id: string }
     }
 }
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
     await dbConnect();
     try {
+        const { id } = await params;
         const postData = await request.json();
         if (postData.slug) {
             let slug = postData.slug;
-            let existingPost = await Post.findOne({ slug, _id: { $ne: params.id } });
+            let existingPost = await Post.findOne({ slug, _id: { $ne: id } });
             while (existingPost) {
                 slug = `${postData.slug}-${Math.random().toString(36).substring(2, 7)}`;
-                existingPost = await Post.findOne({ slug, _id: { $ne: params.id } });
+                existingPost = await Post.findOne({ slug, _id: { $ne: id } });
             }
             postData.slug = slug;
         }
-        const updatedPost = await Post.findByIdAndUpdate(params.id, postData, { new: true });
+        const updatedPost = await Post.findByIdAndUpdate(id, postData, { new: true });
         if (!updatedPost) {
             return NextResponse.json({ message: "Post not found" }, { status: 404 });
         }
@@ -38,10 +40,11 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     }
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
     await dbConnect();
     try {
-        const deletedPost = await Post.findByIdAndDelete(params.id);
+        const { id } = await params;
+        const deletedPost = await Post.findByIdAndDelete(id);
         if (!deletedPost) {
             return NextResponse.json({ message: "Post not found" }, { status: 404 });
         }
