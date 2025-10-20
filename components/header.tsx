@@ -6,7 +6,8 @@ import { cn } from "@/lib/utils"
 import { usePathname, useRouter } from "next/navigation"
 import { useSession, signOut } from "next-auth/react"
 import { ModeToggle } from "@/components/mode-toggle"
-import { CommandIcon, Pen, Terminal, User, LogOut, LogIn } from "lucide-react"
+import { CommandIcon, Pen, Terminal, User, LogOut, LogIn, Crown } from "lucide-react"
+import { isAdminClient } from "@/lib/auth-client"
 import { Button } from "@/components/ui-tailwind/button"
 import {
   DropdownMenu,
@@ -21,6 +22,7 @@ import Logo from "./logo"
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(() => isAdminClient())
   const pathname = usePathname()
   const router = useRouter()
   const { data: session, status } = useSession()
@@ -31,6 +33,11 @@ export default function Header() {
 
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  // Check admin status
+  useEffect(() => {
+    setIsAdmin(isAdminClient())
   }, [])
 
   return (
@@ -78,26 +85,60 @@ export default function Header() {
           {/* Authentication Section */}
           {status === "loading" ? (
             <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
-          ) : session ? (
+          ) : (session || isAdmin) ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="icon" className="border-primary/20 hover:bg-primary/10 hover:border-primary/30">
-                  <User className="h-4 w-4 text-primary" />
+                  {isAdmin ? (
+                    <Crown className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                  ) : (
+                    <User className="h-4 w-4 text-primary" />
+                  )}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" side="right" forceMount>
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-2">
-                    <p className="text-sm font-medium leading-none">
-                      {session.user?.name || "User"}
-                    </p>
-                    <p className="text-xs leading-none text-muted-foreground">
-                      {session.user?.email}
-                    </p>
+                    {isAdmin ? (
+                      <>
+                        <p className="text-sm font-medium leading-none flex items-center gap-2">
+                          <Crown className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                          Admin
+                        </p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          reply@blog.io.tech
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-sm font-medium leading-none">
+                          {session?.user?.name || "User"}
+                        </p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {session?.user?.email}
+                        </p>
+                      </>
+                    )}
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })}>
+                {isAdmin && (
+                  <DropdownMenuItem onClick={() => router.push("/admin")}>
+                    <Terminal className="mr-2 h-4 w-4" />
+                    <span>Admin Panel</span>
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem onClick={() => {
+                  if (isAdmin) {
+                    // For admin, clear cookie and reload
+                    document.cookie = "isLoggedIn=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                    router.push("/");
+                    window.location.reload();
+                  } else {
+                    // For regular users, use next-auth signOut
+                    signOut({ callbackUrl: "/" });
+                  }
+                }}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Sign Out</span>
                 </DropdownMenuItem>
