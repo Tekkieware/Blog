@@ -74,8 +74,8 @@ export default function AboutPage() {
             {/* Content Column */}
             <div className="space-y-6">
               <div>
-                <h2 className="text-3xl font-bold font-mono">Alex Morgan</h2>
-                <p className="text-muted-foreground">Senior Software Engineer & System Architect</p>
+                <h2 className="text-3xl font-bold font-mono">Isaiah Ozadhe</h2>
+                <p className="text-muted-foreground">Software Engineer</p>
               </div>
 
               <div className="flex flex-wrap gap-2">
@@ -104,26 +104,35 @@ export default function AboutPage() {
               <Separator className="my-4" />
 
               <div className="space-y-4 text-muted-foreground">
+
                 <p>
-                  With over 12 years of experience in software engineering and system architecture, I've navigated the
-                  full spectrum of development challenges across startups, enterprises, and everything in between.
+                  Hello, I'm Isaiah — a full-stack engineer who transforms complex problems into fast and reliable solutions.
+                  I craft intuitive and engaging user experiences with <strong>React</strong>, <strong>Next.js</strong>, and <strong>TypeScript</strong>,
+                  while building robust backends using <strong>Python</strong>, <strong>Flask</strong>, <strong>Django</strong>, and <strong>FastAPI</strong>.
                 </p>
+
+
+
                 <p>
-                  My journey began as a frontend developer, crafting pixel-perfect interfaces and intuitive user
-                  experiences. As I delved deeper into the stack, I developed a passion for backend systems, database
-                  optimization, and distributed architectures that could scale to millions of users.
+                  From pixel-perfect designs to high-performance APIs, I thrive on the entire development lifecycle.
+                  My toolkit includes <strong>Docker</strong>, <strong>CI/CD</strong>, <strong>MongoDB, PostgreSQL, MySQL</strong>, and modern state management —
+                  everything needed to ship production-ready systems that serve users well.
                 </p>
+
                 <p>
-                  Throughout my career, I've led engineering teams through complex projects, mentored junior developers,
-                  and established technical standards that balance innovation with maintainability. I believe that great
-                  software is not just about code—it's about the people who build it and the processes that guide them.
+                  This blog is my digital workshop where I share real-world insights, debugging adventures, and the patterns
+                  I've discovered building real applications. If you're passionate about clean code and smart architecture,
+                  welcome home.
                 </p>
+
                 <p>
-                  This blog is my way of documenting the patterns, practices, and perspectives I've gathered along the
-                  way. Whether you're debugging a tricky production issue or architecting your next big system, I hope
-                  these insights help you navigate your own engineering journey.
+                  Got questions about a technical challenge? Interested in collaborating on a project? Looking to hire?
+                  I'm always open to connecting with fellow developers and exploring new opportunities.
+                  <strong> Don't hesitate to reach out!</strong>
                 </p>
+
               </div>
+
 
               <div className="pt-4">
                 <h3 className="text-xl font-mono font-bold mb-4">Core Competencies</h3>
@@ -137,19 +146,19 @@ export default function AboutPage() {
                   <div className="space-y-2">
                     <div className="font-medium">Frontend Development</div>
                     <div className="h-2 bg-background rounded-full overflow-hidden">
-                      <div className="h-full bg-indigo-400 w-[90%] rounded-full"></div>
+                      <div className="h-full bg-indigo-400 w-[95%] rounded-full"></div>
                     </div>
                   </div>
                   <div className="space-y-2">
                     <div className="font-medium">Backend Engineering</div>
                     <div className="h-2 bg-background rounded-full overflow-hidden">
-                      <div className="h-full bg-blue-400 w-[85%] rounded-full"></div>
+                      <div className="h-full bg-blue-400 w-[95%] rounded-full"></div>
                     </div>
                   </div>
                   <div className="space-y-2">
                     <div className="font-medium">Team Leadership</div>
                     <div className="h-2 bg-background rounded-full overflow-hidden">
-                      <div className="h-full bg-emerald-400 w-[80%] rounded-full"></div>
+                      <div className="h-full bg-emerald-400 w-[95%] rounded-full"></div>
                     </div>
                   </div>
                 </div>
@@ -161,7 +170,7 @@ export default function AboutPage() {
         {/* Featured Projects Section */}
         <div className="mt-16">
           <h2 className="text-2xl font-bold font-mono mb-6">Featured Projects</h2>
-          <Card className="p-6 bg-gradient-to-br from-background to-background/80 backdrop-blur-sm">
+          <Card className="p-6 md:p-8 border-2 border-primary/20 bg-gradient-to-br from-background to-background/80 backdrop-blur-sm">
             <div className="space-y-4">
               <p className="text-muted-foreground text-center">
                 Explore my latest projects and technical work
