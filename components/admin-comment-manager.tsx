@@ -62,12 +62,12 @@ export function AdminCommentManager({ isOpen, onClose, postSlug }: AdminCommentM
 
     const fetchComments = async () => {
         if (!postSlug) return
-        
+
         setLoading(true)
         try {
             const response = await fetch(`/api/admin/comments?postSlug=${encodeURIComponent(postSlug)}`)
             const data = await response.json()
-            
+
             if (response.ok) {
                 setComments(data.comments || [])
             } else {
