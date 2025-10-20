@@ -23,6 +23,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { ca } from "date-fns/locale"
 
 interface Reply {
     _id: string
@@ -827,49 +828,51 @@ function CommentItem({
                                     )}
 
                                     <div className="relative ml-auto" ref={menuRef}>
-                                        <button
-                                            onClick={() => setShowMenu(!showMenu)}
-                                            className="p-1 text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-muted"
-                                        >
-                                            <MoreVertical className="h-3 w-3 sm:h-4 sm:w-4" />
-                                        </button>
+                                        {
+                                            canModify && <button
+                                                onClick={() => setShowMenu(!showMenu)}
+                                                className="p-1 text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-muted"
+                                            >
+                                                <MoreVertical className="h-3 w-3 sm:h-4 sm:w-4" />
+                                            </button>
+                                        }
+
 
                                         <AnimatePresence>
-                                            {showMenu && (
+                                            {showMenu && canModify && (
                                                 <motion.div
                                                     initial={{ opacity: 0, scale: 0.95, y: -10 }}
                                                     animate={{ opacity: 1, scale: 1, y: 0 }}
                                                     exit={{ opacity: 0, scale: 0.95, y: -10 }}
                                                     className="absolute right-0 top-full mt-1 z-10 w-36 sm:w-40 bg-card border-2 border-border rounded-lg shadow-lg overflow-hidden"
                                                 >
-                                                    <button className="w-full px-3 py-2 text-xs sm:text-sm text-left hover:bg-muted flex items-center gap-2 transition-colors">
+                                                    {/* <button className="w-full px-3 py-2 text-xs sm:text-sm text-left hover:bg-muted flex items-center gap-2 transition-colors">
                                                         <Flag className="h-3 w-3 sm:h-4 sm:w-4" />
                                                         Report
-                                                    </button>
-                                                    {canModify && (
-                                                        <>
-                                                            <button
-                                                                onClick={handleEditClick}
-                                                                disabled={isUpdating || isDeleting}
-                                                                className="w-full px-3 py-2 text-xs sm:text-sm text-left hover:bg-muted flex items-center gap-2 transition-colors disabled:opacity-50"
-                                                            >
-                                                                <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
-                                                                Edit
-                                                            </button>
-                                                            <button
-                                                                onClick={handleDeleteClick}
-                                                                disabled={isUpdating || isDeleting}
-                                                                className="w-full px-3 py-2 text-xs sm:text-sm text-left hover:bg-red-500/10 text-red-500 flex items-center gap-2 transition-colors disabled:opacity-50"
-                                                            >
-                                                                {isDeleting ? (
-                                                                    <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
-                                                                ) : (
-                                                                    <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
-                                                                )}
-                                                                {isDeleting ? "Deleting..." : "Delete"}
-                                                            </button>
-                                                        </>
-                                                    )}
+                                                    </button> */}
+                                                    <>
+                                                        <button
+                                                            onClick={handleEditClick}
+                                                            disabled={isUpdating || isDeleting}
+                                                            className="w-full px-3 py-2 text-xs sm:text-sm text-left hover:bg-muted flex items-center gap-2 transition-colors disabled:opacity-50"
+                                                        >
+                                                            <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
+                                                            Edit
+                                                        </button>
+                                                        <button
+                                                            onClick={handleDeleteClick}
+                                                            disabled={isUpdating || isDeleting}
+                                                            className="w-full px-3 py-2 text-xs sm:text-sm text-left hover:bg-red-500/10 text-red-500 flex items-center gap-2 transition-colors disabled:opacity-50"
+                                                        >
+                                                            {isDeleting ? (
+                                                                <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+                                                            ) : (
+                                                                <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                                                            )}
+                                                            {isDeleting ? "Deleting..." : "Delete"}
+                                                        </button>
+                                                    </>
+
                                                 </motion.div>
                                             )}
                                         </AnimatePresence>
