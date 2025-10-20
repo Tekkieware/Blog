@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Search, Edit, Trash2, ArrowLeft, LogOut } from "lucide-react"
+import { Plus, Search, Edit, Trash2, ArrowLeft, LogOut, MessageSquare } from "lucide-react"
 import { Button } from "@/components/ui-tailwind/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -22,6 +22,7 @@ import { toast } from "sonner";
 import AdminPageSkeleton from "./loading"
 
 import AdminNav from '@/components/admin-nav';
+import { AdminCommentManager } from '@/components/admin-comment-manager';
 
 export default function AdminPage() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -30,6 +31,8 @@ export default function AdminPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [layerCounts, setLayerCounts] = useState<{ [key: string]: number }>({});
+  const [showCommentSheet, setShowCommentSheet] = useState(false);
+  const [selectedPostSlug, setSelectedPostSlug] = useState<string>("");
   const router = useRouter()
 
   useEffect(() => {
@@ -173,6 +176,19 @@ export default function AdminPage() {
                               <Button
                                 variant="outline"
                                 size="sm"
+                                className="h-8 w-8 p-0 border-blue-500/20 hover:bg-blue-500/10 hover:border-blue-500/30"
+                                onClick={() => {
+                                  setSelectedPostSlug(post.slug);
+                                  setShowCommentSheet(true);
+                                }}
+                                title="Manage Comments"
+                              >
+                                <MessageSquare className="h-4 w-4 text-blue-500" />
+                                <span className="sr-only">Comments</span>
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
                                 className="h-8 w-8 p-0 border-primary/20 hover:bg-primary/10 hover:border-primary/30"
                                 onClick={() => router.push(`/admin/posts/edit/${post._id}`)}
                               >
@@ -255,6 +271,13 @@ export default function AdminPage() {
           </div>
         </div>
       </main>
+
+      {/* Comment Management Sheet */}
+      <AdminCommentManager
+        isOpen={showCommentSheet}
+        onClose={() => setShowCommentSheet(false)}
+        postSlug={selectedPostSlug}
+      />
     </div>
   )
 }

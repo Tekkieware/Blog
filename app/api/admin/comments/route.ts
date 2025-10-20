@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import dbConnect from '@/lib/db'
 import Comment from '@/models/comment'
 
-// GET - Admin route to view comment statistics
+// GET - Admin route to view comment statistics or get comments by post slug
 export async function GET(request: NextRequest) {
     try {
         // Check if user is admin (you can implement proper admin auth here)
@@ -14,7 +14,22 @@ export async function GET(request: NextRequest) {
 
         await dbConnect()
 
-        // Get overall comment statistics
+        const { searchParams } = new URL(request.url)
+        const postSlug = searchParams.get('postSlug')
+
+        // If postSlug is provided, return comments for that specific post
+        if (postSlug) {
+            const comments = await Comment.find({ postSlug })
+                .sort({ createdAt: -1 })
+                .lean()
+
+            return NextResponse.json({
+                success: true,
+                comments
+            })
+        }
+
+        // Otherwise, return overall statistics (existing functionality)
         const totalComments = await Comment.countDocuments()
 
         const statsResult = await Comment.aggregate([
