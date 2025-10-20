@@ -5,6 +5,16 @@ import { ArrowLeft, Save, Eye, ImageIcon, X, Calendar, Clock, User, Tag, Wand2, 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { ImageUploadModal } from "@/components/image-upload-modal"
 import { MarkdownRenderer } from "@/components/markdown-renderer"
 import Link from "next/link"
@@ -20,6 +30,7 @@ export default function EditPostPage({ params: promiseParams }: { params: Promis
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showPreview, setShowPreview] = useState(false)
   const [showCoverImageModal, setShowCoverImageModal] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [formData, setFormData] = useState<Partial<IPost>>({
     title: "",
     excerpt: "",
@@ -149,16 +160,20 @@ export default function EditPostPage({ params: promiseParams }: { params: Promis
     }
   };
 
-  const handleDelete = async () => {
-    if (confirm("Are you sure you want to delete this post?")) {
-        const toastId = toast.loading("Deleting post...");
-        try {
-          await deletePost(params.id);
-          toast.success("Post deleted successfully!", { id: toastId });
-          router.push("/admin");
-        } catch (error) {
-          toast.error("Failed to delete post.", { id: toastId });
-        }
+  const handleDelete = () => {
+    setShowDeleteDialog(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    const toastId = toast.loading("Deleting post...");
+    try {
+      await deletePost(params.id);
+      toast.success("Post deleted successfully!", { id: toastId });
+      router.push("/admin");
+    } catch (error) {
+      toast.error("Failed to delete post.", { id: toastId });
+    } finally {
+      setShowDeleteDialog(false);
     }
   };
 
@@ -549,6 +564,27 @@ export default function EditPostPage({ params: promiseParams }: { params: Promis
         onClose={() => setShowCoverImageModal(false)}
         onSave={handleCoverImageSave}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent className=" border-none">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Post</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this post? This action cannot be undone and will permanently remove the post and all its associated comments.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className="bg-red-600 hover:bg-red-700 focus:ring-red-600 text-white"
+            >
+              Delete Post
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

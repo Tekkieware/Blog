@@ -14,6 +14,17 @@ import {
   PaginationNext,
 } from "@/components/ui/pagination";
 import { Badge } from "@/components/ui-tailwind/badge"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { deleteCookie } from "cookies-next"
 import Link from "next/link"
 import { getPostsAndCount, deletePost, getLayerCounts } from "@/lib/services/postService";
@@ -33,6 +44,8 @@ export default function AdminPage() {
   const [layerCounts, setLayerCounts] = useState<{ [key: string]: number }>({});
   const [showCommentSheet, setShowCommentSheet] = useState(false);
   const [selectedPostSlug, setSelectedPostSlug] = useState<string>("");
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [postToDelete, setPostToDelete] = useState<string | null>(null);
   const router = useRouter()
 
   useEffect(() => {
@@ -65,16 +78,23 @@ export default function AdminPage() {
     fetchPosts();
   }, [searchTerm, currentPage]);
 
-  const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this post?")) {
-      const toastId = toast.loading("Deleting post...");
-      try {
-        await deletePost(id);
-        setPosts(posts.filter((post) => post._id !== id));
-        toast.success("Post deleted successfully!", { id: toastId });
-      } catch (error) {
-        toast.error("Failed to delete post.", { id: toastId });
-      }
+  const handleDelete = (id: string) => {
+    setPostToDelete(id);
+    setShowDeleteDialog(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!postToDelete) return;
+
+    const toastId = toast.loading("Deleting post...");
+    try {
+      await deletePost(postToDelete);
+      setPosts(posts.filter((post) => post._id !== postToDelete));
+      toast.success("Post deleted successfully!", { id: toastId });
+      setShowDeleteDialog(false);
+      setPostToDelete(null);
+    } catch (error) {
+      toast.error("Failed to delete post.", { id: toastId });
     }
   };
 
@@ -278,6 +298,29 @@ export default function AdminPage() {
         onClose={() => setShowCommentSheet(false)}
         postSlug={selectedPostSlug}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent className=" border-none">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Post</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this post? This action cannot be undone and will permanently remove the post and all its associated comments.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setPostToDelete(null)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className="bg-red-600 hover:bg-red-700 focus:ring-red-600 text-white"
+            >
+              Delete Post
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
