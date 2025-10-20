@@ -4,7 +4,8 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
 import { useSession, signOut } from "next-auth/react"
-import { FileCode2, Layers, Mail, Moon, Sun, Tag, Terminal, User, LogIn, LogOut } from "lucide-react"
+import { FileCode2, Layers, Mail, Moon, Sun, Tag, Terminal, User, LogIn, LogOut, Crown } from "lucide-react"
+import { isAdminClient } from "@/lib/auth-client"
 import {
   CommandDialog,
   CommandEmpty,
@@ -17,6 +18,7 @@ import {
 
 export default function CommandPalette() {
   const [open, setOpen] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(() => isAdminClient())
   const router = useRouter()
   const { setTheme } = useTheme()
   const { data: session, status } = useSession()
@@ -31,6 +33,11 @@ export default function CommandPalette() {
 
     document.addEventListener("keydown", down)
     return () => document.removeEventListener("keydown", down)
+  }, [])
+
+  // Check admin status
+  useEffect(() => {
+    setIsAdmin(isAdminClient())
   }, [])
 
   return (
@@ -162,15 +169,43 @@ export default function CommandPalette() {
               <User className="mr-2 h-4 w-4" />
               <span>Loading...</span>
             </CommandItem>
-          ) : session ? (
+          ) : (session || isAdmin) ? (
             <>
               <CommandItem disabled>
-                <User className="mr-2 h-4 w-4" />
-                <span>Signed in as {session.user?.email}</span>
+                {isAdmin ? (
+                  <>
+                    <Crown className="mr-2 h-4 w-4 text-amber-600 dark:text-amber-400" />
+                    <span>Signed in as Admin (reply@blog.io.tech)</span>
+                  </>
+                ) : (
+                  <>
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Signed in as {session?.user?.email}</span>
+                  </>
+                )}
               </CommandItem>
+              {isAdmin && (
+                <CommandItem
+                  onSelect={() => {
+                    router.push("/admin")
+                    setOpen(false)
+                  }}
+                >
+                  <Terminal className="mr-2 h-4 w-4" />
+                  <span>Admin Panel</span>
+                </CommandItem>
+              )}
               <CommandItem
                 onSelect={async () => {
-                  await signOut({ callbackUrl: "/" })
+                  if (isAdmin) {
+                    // For admin, clear cookie and reload
+                    document.cookie = "isLoggedIn=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                    router.push("/");
+                    window.location.reload();
+                  } else {
+                    // For regular users, use next-auth signOut
+                    await signOut({ callbackUrl: "/" });
+                  }
                   setOpen(false)
                 }}
               >
