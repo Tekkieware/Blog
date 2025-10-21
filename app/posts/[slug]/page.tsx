@@ -10,18 +10,19 @@ export const metadata: Metadata = generateSEOMetadata({
   url: 'https://blog.isaiahozadhe.tech/posts',
 })
 
-export default function PostDetail({ params }: { params: { slug: string } }) {
+export default async function PostDetail({ params }: { params: { slug: string } }) {
+  const resolvedParams = await params;
   return (
     <>
       <StructuredData
         type="website"
         data={{
           name: 'Isaiah Ozadhe Blog Post',
-          url: `https://blog.isaiahozadhe.tech/posts/${params.slug}`,
+          url: `https://blog.isaiahozadhe.tech/posts/${resolvedParams.slug}`,
           description: 'Software engineering insights and tutorials.',
         }}
       />
-      <PostDetailClient slug={params.slug} />
+      <PostDetailClient slug={resolvedParams.slug} />
     </>
-  )
+  );
 }
