@@ -45,6 +45,15 @@ export const TableOfContents = ({ items, className }: TableOfContentsProps) => {
         }
     };
 
+
+    const handleCommentsClick = (id: string) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+        }
+        setActiveId("comments");
+    };
+
     return (
         <nav className={cn("space-y-4", className)}>
             <div className="bg-gradient-subtle border border-border rounded-lg p-4 shadow-soft">
@@ -72,6 +81,21 @@ export const TableOfContents = ({ items, className }: TableOfContentsProps) => {
                             </button>
                         </li>
                     ))}
+                    {/* Always add Comments at the end */}
+                    <li key="comments" style={{ paddingLeft: "0px" }} className='hover:font-bold'>
+                        <button
+                            onClick={() => handleClick("comments")}
+                            className={cn(
+                                "text-left w-full flex items-center transition-colors hover:text-toc-active group",
+                                activeId === "comments"
+                                    ? "text-toc-active font-bold"
+                                    : "text-toc-inactive"
+                            )}
+                        >
+                            <span className={cn("mr-2 text-xs opacity-50 group-hover:opacity-70", activeId === "comments" && "text-primary")}>#</span>
+                            <span className="truncate">Comments</span>
+                        </button>
+                    </li>
                 </ul>
             </div>
         </nav>

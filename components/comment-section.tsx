@@ -1016,7 +1016,7 @@ export function CommentSection({ postSlug, postAuthor, className }: CommentSecti
 
     if (loading) {
         return (
-            <div className={cn("space-y-6", className)}>
+            <div className={cn("space-y-6", className)} id="comments">
                 {/* Header Skeleton */}
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-3">
@@ -1129,7 +1129,7 @@ export function CommentSection({ postSlug, postAuthor, className }: CommentSecti
     return (
         <div className={cn("space-y-6", className)}>
             {/* Header */}
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between" id="comments">
                 <div className="flex items-center gap-3">
                     <div className="p-2 rounded-full bg-primary/10 border border-primary/20">
                         <MessageSquare className="h-5 w-5 text-primary" />
