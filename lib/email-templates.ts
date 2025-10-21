@@ -1,26 +1,26 @@
 interface MagicLinkEmailProps {
-    url: string
-    email: string
-    host?: string
-    expiresIn?: number
+  url: string
+  email: string
+  host?: string
+  expiresIn?: number
 }
 
 export function magicLinkEmailHTML({ url, email, host = "IO", expiresIn = 24 }: MagicLinkEmailProps) {
-    // Light mode colors from the theme
-    const colors = {
-        background: "#f3f1ff",
-        surface: "#ffffff",
-        primary: "#00F0FF", // Cyan
-        primaryDark: "#0088cc",
-        text: "#222222",
-        textMuted: "#666666",
-        border: "#e5e3ff",
-    }
+  // Light mode colors from the theme
+  const colors = {
+    background: "#f3f1ff",
+    surface: "#ffffff",
+    primary: "#00F0FF", // Cyan
+    primaryDark: "#0088cc",
+    text: "#222222",
+    textMuted: "#666666",
+    border: "#e5e3ff",
+  }
 
-    const escapedHost = host.replace(/\./g, "&#8203;.")
-    const displayEmail = email.split("@")[0]
+  const escapedHost = host.replace(/\./g, "&#8203;.")
+  const displayEmail = email.split("@")[0]
 
-    return `
+  return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -51,8 +51,7 @@ export function magicLinkEmailHTML({ url, email, host = "IO", expiresIn = 24 }: 
       margin-bottom: 40px;
     }
     .logo-icon {
-      width: 32px;
-      height: 32px;
+      padding: 5px 7px;
       background: linear-gradient(135deg, ${colors.primary}, ${colors.primaryDark});
       border-radius: 6px;
       display: flex;
@@ -220,9 +219,9 @@ export function magicLinkEmailHTML({ url, email, host = "IO", expiresIn = 24 }: 
 }
 
 export function magicLinkEmailText({ url, email, host = "IO", expiresIn = 24 }: MagicLinkEmailProps): string {
-    const displayEmail = email.split("@")[0]
+  const displayEmail = email.split("@")[0]
 
-    return `
+  return `
 Sign in to ${host}
 
 Hey ${displayEmail}, you asked us to send you a magic link for quickly signing into your ${host} account.
@@ -244,36 +243,36 @@ Questions? Check our help center or reply to this email.
  * This replaces the default email template with our custom one
  */
 export async function sendVerificationRequest({
-    identifier: email,
-    url,
-    provider,
+  identifier: email,
+  url,
+  provider,
 }: {
-    identifier: string
-    url: string
-    provider: any
+  identifier: string
+  url: string
+  provider: any
 }) {
-    const { host } = new URL(url)
-    const hostDisplayName = "IO"
+  const { host } = new URL(url)
+  const hostDisplayName = "IO"
 
-    const response = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-            Authorization: `Bearer ${provider.apiKey}`,
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            from: provider.from,
-            to: email,
-            subject: `Your ${hostDisplayName} magic link is ready ✨`,
-            html: magicLinkEmailHTML({ url, email, host: hostDisplayName }),
-            text: magicLinkEmailText({ url, email, host: hostDisplayName }),
-        }),
-    })
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${provider.apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: provider.from,
+      to: email,
+      subject: `Your ${hostDisplayName} magic link is ready ✨`,
+      html: magicLinkEmailHTML({ url, email, host: hostDisplayName }),
+      text: magicLinkEmailText({ url, email, host: hostDisplayName }),
+    }),
+  })
 
-    if (!response.ok) {
-        const error = await response.text()
-        throw new Error(`Failed to send email: ${response.status} ${error}`)
-    }
+  if (!response.ok) {
+    const error = await response.text()
+    throw new Error(`Failed to send email: ${response.status} ${error}`)
+  }
 
-    return response.json()
+  return response.json()
 }
