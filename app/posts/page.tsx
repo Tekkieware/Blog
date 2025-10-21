@@ -1,142 +1,40 @@
-"use client"
+import { Metadata } from 'next'
+import { generateSEOMetadata } from '@/lib/seo'
+import { StructuredData } from '@/components/structured-data'
+import PostsPageClient from './posts-client'
 
-import { PostGrid } from "@/components/post-grid"
-import { PostFilters } from "@/components/post-filters"
-import { useSearchParams } from "next/navigation"
-import { useEffect, useState } from "react"
-import { PostList } from "@/components/post-list"
-import { IPost } from "@/models/post"
-import { getPostsAndCount } from "@/lib/services/postService"
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination"
-import { PaginationLoader } from "@/components/ui/pagination-loader"
+export const metadata: Metadata = generateSEOMetadata({
+  title: 'All Posts - Engineering Insights & Tutorials',
+  description: 'Browse all engineering blog posts by Isaiah Ozadhe. Find articles on web development, system design, programming tutorials, and tech insights. Filter by categories and search topics.',
+  url: 'https://blog.isaiahozadhe.tech/posts',
+  keywords: [
+    'blog posts',
+    'engineering articles',
+    'programming tutorials',
+    'web development',
+    'system design',
+    'software engineering',
+    'React tutorials',
+    'Next.js guides',
+    'TypeScript tips',
+    'Python programming',
+    'tech insights',
+    'coding blog'
+  ],
+})
 
 export default function PostsPage() {
-  const searchParams = useSearchParams()
-  const layerParam = searchParams.get("layer")
-  const pageParam = searchParams.get("page")
-  const [activeLayer, setActiveLayer] = useState<string>(layerParam || "all")
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
-  const [loading, setLoading] = useState(true)
-  const [posts, setPosts] = useState<IPost[]>([])
-  const [page, setPage] = useState(pageParam ? parseInt(pageParam) : 1)
-  const [totalPages, setTotalPages] = useState(1)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-  const POSTS_PER_PAGE = 10;
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearchTerm(searchTerm);
-    }, 500); // 500ms debounce
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [searchTerm]);
-
-  useEffect(() => {
-    if (layerParam) {
-      setActiveLayer(layerParam)
-    }
-
-    async function fetchPosts() {
-      setLoading(true)
-      const { posts: fetchedPosts, total } = await getPostsAndCount(page, POSTS_PER_PAGE, activeLayer, debouncedSearchTerm)
-      setPosts(fetchedPosts)
-      setTotalPages(Math.ceil(total / POSTS_PER_PAGE))
-      setLoading(false)
-    }
-
-    fetchPosts()
-  }, [page, layerParam, debouncedSearchTerm])
-
-  const handlePageChange = (newPage: number) => {
-    setPage(newPage)
-    // Update URL to reflect the new page
-    window.history.pushState(null, '', `?page=${newPage}${layerParam ? `&layer=${layerParam}` : ''}`)
-  }
-
-  const handleSearchChange = (term: string) => {
-    setSearchTerm(term);
-    setPage(1); // Reset to first page on new search
-  }
-
   return (
-    <div className="container py-8">
-      <div className="flex flex-col space-y-6">
-        {/* Header */}
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl md:text-5xl font-mono font-bold bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
-            Software Engineering Insights
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Documenting the craft of building systems that last, one layer at a time.
-          </p>
-        </div>
-        <PostFilters
-          activeLayer={activeLayer}
-          setActiveLayer={setActiveLayer}
-          viewMode={viewMode}
-          setViewMode={setViewMode}
-          searchTerm={searchTerm}
-          onSearchChange={handleSearchChange}
-        />
-
-        {viewMode === "grid" ? (
-          <PostGrid loading={loading} activeLayer={activeLayer} posts={posts} />
-        ) : (
-          <PostList loading={loading} activeLayer={activeLayer} posts={posts} />
-        )}
-
-        {loading ? (
-          <PaginationLoader />
-        ) : totalPages > 1 && (
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    handlePageChange(Math.max(1, page - 1))
-                  }}
-                />
-              </PaginationItem>
-              {[...Array(totalPages)].map((_, i) => (
-                <PaginationItem key={i}>
-                  <PaginationLink
-                    href="#"
-                    isActive={page === i + 1}
-                    onClick={(e) => {
-                      e.preventDefault()
-                      handlePageChange(i + 1)
-                    }}
-                  >
-                    {i + 1}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-              <PaginationItem>
-                <PaginationNext
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    handlePageChange(Math.min(totalPages, page + 1))
-                  }}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        )}
-      </div>
-    </div>
+    <>
+      <StructuredData
+        type="website"
+        data={{
+          name: 'All Posts - Isaiah Ozadhe Blog',
+          url: 'https://blog.isaiahozadhe.tech/posts',
+          description: 'Browse all engineering blog posts covering web development, system design, and programming tutorials.',
+        }}
+      />
+      <PostsPageClient />
+    </>
   )
 }

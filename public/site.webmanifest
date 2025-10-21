@@ -1,0 +1,38 @@
+{
+    "name": "Isaiah Ozadhe - Software Engineering Blog",
+    "short_name": "Isaiah Ozadhe Blog",
+    "description": "Software engineer sharing insights on engineering solutions, programming tutorials, and tech innovations.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0a0a0a",
+    "theme_color": "#ffffff",
+    "orientation": "portrait-primary",
+    "scope": "/",
+    "icons": [
+        {
+            "src": "/logo.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        }
+    ],
+    "categories": [
+        "technology",
+        "education",
+        "productivity"
+    ],
+    "lang": "en",
+    "dir": "ltr"
+}

@@ -106,7 +106,7 @@ export default function Header() {
                           Admin
                         </p>
                         <p className="text-xs leading-none text-muted-foreground">
-                          reply@blog.isaiahozadhe.tech
+                          admin@blog.isaiahozadhe.tech
                         </p>
                       </>
                     ) : (

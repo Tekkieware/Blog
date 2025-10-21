@@ -8,6 +8,7 @@ import { AuthProvider } from "@/components/auth-provider"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import CommandPalette from "@/components/command-palette"
+import { StructuredData } from "@/components/structured-data"
 import { cn } from "@/lib/utils"
 import { Toaster } from "@/components/ui/sonner"
 
@@ -23,9 +24,85 @@ const fontMono = FontMono({
 })
 
 export const metadata: Metadata = {
-  title: "Isaiah Ozadhe: A Peek Into a Software Engineer's Mind",
-  description: "Build solutions. Share thoughts.",
-  generator: 'my blog'
+  title: {
+    template: '%s | Isaiah Ozadhe Blog',
+    default: 'Isaiah Ozadhe: A Peek Into a Software Engineer\'s Mind',
+  },
+  description: 'Software engineer sharing insights on engineering solutions, programming tutorials, and tech innovations. Build solutions. Share thoughts.',
+  keywords: [
+    'engineering solutions',
+    'programming',
+    'software engineering',
+    'JavaScript',
+    'TypeScript',
+    'React',
+    'Next.js',
+    'Node.js',
+    'tech blog',
+    'Isaiah Ozadhe'
+  ],
+  authors: [{ name: 'Isaiah Ozadhe', url: 'https://isaiahozadhe.tech' }],
+  creator: 'Isaiah Ozadhe',
+  publisher: 'Isaiah Ozadhe',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL('https://blog.isaiahozadhe.tech'),
+  alternates: {
+    canonical: '/',
+    types: {
+      'application/rss+xml': '/feed.xml',
+    },
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://blog.isaiahozadhe.tech',
+    siteName: 'Isaiah Ozadhe Blog',
+    title: 'Isaiah Ozadhe: A Peek Into a Software Engineer\'s Mind',
+    description: 'Full-stack developer sharing insights on modern web development, programming tutorials, and tech innovations.',
+    images: [
+      {
+        url: '/api/og',
+        width: 1200,
+        height: 630,
+        alt: 'Isaiah Ozadhe Blog',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Isaiah Ozadhe: A Peek Into a Software Engineer\'s Mind',
+    description: 'Full-stack developer sharing insights on modern web development, programming tutorials, and tech innovations.',
+    images: ['/api/og'],
+    creator: '@isaiahozadhe',
+    site: '@isaiahozadhe',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    nocache: true,
+    googleBot: {
+      index: true,
+      follow: false,
+      noimageindex: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon-16x16.png',
+    apple: '/apple-touch-icon.png',
+  },
+  manifest: '/site.webmanifest',
+  generator: 'Next.js',
+  applicationName: 'Isaiah Ozadhe Blog',
+  referrer: 'origin-when-cross-origin',
+  category: 'technology',
 }
 
 export default function RootLayout({
@@ -37,6 +114,22 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <ThemeScript />
+        <StructuredData
+          type="website"
+          data={{
+            name: 'Isaiah Ozadhe Blog',
+            url: 'https://blog.isaiahozadhe.tech',
+            description: 'Software engineer sharing insights on engineering solutions, programming tutorials, and tech innovations.',
+          }}
+        />
+        <StructuredData
+          type="person"
+          data={{}}
+        />
+        <StructuredData
+          type="organization"
+          data={{}}
+        />
       </head>
       <body className={cn("min-h-screen font-sans antialiased", fontSans.variable, fontMono.variable)}>
         <AuthProvider>
