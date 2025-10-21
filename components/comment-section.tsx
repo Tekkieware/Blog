@@ -143,14 +143,14 @@ function ReplyForm({
         }
 
         // Use userName if provided, otherwise use email (handle admin case)
-        const userEmail = session?.user?.email || (isAdmin ? "reply@blog.io.tech" : "")
+        const userEmail = session?.user?.email || (isAdmin ? "reply@blog.isaiahozadhe.tech" : "")
         const displayName = userName.trim() || userEmail?.split('@')[0] || "Anonymous"
 
         // For admin replies, use special handling
         const adminName = postAuthor ? `${postAuthor} (Admin)` : "Post Author (Admin)"
         const isAdminReply = isAdmin && userName.trim() === adminName
         const replyUserName = isAdminReply ? adminName : displayName
-        const replyEmail = isAdminReply ? "reply@blog.io.tech" : userEmail
+        const replyEmail = isAdminReply ? "reply@blog.isaiahozadhe.tech" : userEmail
 
         setIsSubmitting(true)
 
@@ -207,7 +207,7 @@ function ReplyForm({
                             {isAdmin && userName.trim() === "Post Author" ? (
                                 <span className="text-amber-600 dark:text-amber-400 flex items-center gap-1">
                                     <Crown className="h-3 w-3" />
-                                    As: Post Author (reply@blog.io.tech)
+                                    As: Post Author (reply@blog.isaiahozadhe.tech)
                                 </span>
                             ) : userName.trim() ? (
                                 `As: ${userName}`
@@ -218,7 +218,7 @@ function ReplyForm({
                     </div>
                     <input
                         type="email"
-                        value={isAdmin && userName === "Post Author" ? "reply@blog.io.tech" : session?.user?.email || ""}
+                        value={isAdmin && userName === "Post Author" ? "reply@blog.isaiahozadhe.tech" : session?.user?.email || ""}
                         disabled
                         className="px-3 py-2 border border-border rounded-md bg-muted text-sm"
                     />
@@ -278,7 +278,7 @@ function ReplyItem({
     const menuRef = useRef<HTMLDivElement>(null)
 
     const isCurrentUser = session?.user?.email === reply.user.email
-    const canModify = isCurrentUser || (isAdmin && reply.user.email === "reply@blog.io.tech") // Admin can only edit their own admin comments
+    const canModify = isCurrentUser || (isAdmin && reply.user.email === "reply@blog.isaiahozadhe.tech") // Admin can only edit their own admin comments
 
     // Close menu when clicking outside
     useEffect(() => {
@@ -404,7 +404,7 @@ function ReplyItem({
                                     You
                                 </Badge>
                             )}
-                            {reply.user.email === "reply@blog.io.tech" && (
+                            {reply.user.email === "reply@blog.isaiahozadhe.tech" && (
                                 <Badge
                                     variant="outline"
                                     className="text-xs px-1 py-0 border-amber-300 text-amber-600 dark:border-amber-800 dark:text-amber-400"
@@ -572,7 +572,7 @@ function CommentItem({
     const menuRef = useRef<HTMLDivElement>(null)
 
     const isCurrentUser = session?.user?.email === comment.user.email
-    const canModify = isCurrentUser || (isAdmin && comment.user.email === "reply@blog.io.tech") // Admin can only edit their own admin comments
+    const canModify = isCurrentUser || (isAdmin && comment.user.email === "reply@blog.isaiahozadhe.tech") // Admin can only edit their own admin comments
     const formattedDate = formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })
 
     // Close menu when clicking outside
@@ -736,7 +736,7 @@ function CommentItem({
                                         You
                                     </Badge>
                                 )}
-                                {comment.user.email === "reply@blog.io.tech" && (
+                                {comment.user.email === "reply@blog.isaiahozadhe.tech" && (
                                     <Badge
                                         variant="outline"
                                         className="text-xs px-1.5 sm:px-2 py-0 border-amber-300 text-amber-600 dark:border-amber-800 dark:text-amber-400"

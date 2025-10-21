@@ -175,7 +175,7 @@ export default function CommandPalette() {
                 {isAdmin ? (
                   <>
                     <Crown className="mr-2 h-4 w-4 text-amber-600 dark:text-amber-400" />
-                    <span>Signed in as Admin (reply@blog.io.tech)</span>
+                    <span>Signed in as Admin (reply@blog.isaiahozadhe.tech)</span>
                   </>
                 ) : (
                   <>

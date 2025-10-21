@@ -65,14 +65,14 @@ export function CommentForm({
         }
 
         // Use userName if provided, otherwise use email (handle admin case)
-        const userEmail = session?.user?.email || (isAdmin ? "reply@blog.io.tech" : "")
+        const userEmail = session?.user?.email || (isAdmin ? "reply@blog.isaiahozadhe.tech" : "")
         const displayName = userName.trim() || userEmail?.split('@')[0] || "Anonymous"
 
         // For admin comments, use special handling
         const adminName = postAuthor ? `${postAuthor} (Admin)` : "Post Author (Admin)"
         const isAdminComment = isAdmin && userName.trim() === adminName
         const commentUserName = isAdminComment ? adminName : displayName
-        const commentEmail = isAdminComment ? "reply@blog.io.tech" : userEmail
+        const commentEmail = isAdminComment ? "reply@blog.isaiahozadhe.tech" : userEmail
 
         setIsSubmitting(true)
 
@@ -186,7 +186,7 @@ export function CommentForm({
                                 {isAdmin && userName.trim() === (postAuthor ? `${postAuthor} (Admin)` : "Post Author (Admin)") ? (
                                     <span className="text-amber-600 dark:text-amber-400 flex items-center gap-1">
                                         <Crown className="h-3 w-3" />
-                                        Will post as: {postAuthor ? `${postAuthor} (Admin)` : "Post Author (Admin)"} (reply@blog.io.tech)
+                                        Will post as: {postAuthor ? `${postAuthor} (Admin)` : "Post Author (Admin)"} (reply@blog.isaiahozadhe.tech)
                                     </span>
                                 ) : userName.trim() ? (
                                     `Will display as: ${userName}`
@@ -199,7 +199,7 @@ export function CommentForm({
                             <Label>Email</Label>
                             <Input
                                 type="email"
-                                value={isAdmin && userName === (postAuthor ? `${postAuthor} (Admin)` : "Post Author (Admin)") ? "reply@blog.io.tech" : (session?.user?.email || "")}
+                                value={isAdmin && userName === (postAuthor ? `${postAuthor} (Admin)` : "Post Author (Admin)") ? "reply@blog.isaiahozadhe.tech" : (session?.user?.email || "")}
                                 disabled
                                 className="bg-muted"
                             />

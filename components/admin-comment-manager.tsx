@@ -142,7 +142,7 @@ export function AdminCommentManager({ isOpen, onClose, postSlug }: AdminCommentM
                 body: JSON.stringify({
                     content: replyContent.trim(),
                     userName: replyName.trim() || "Post Author",
-                    userEmail: "reply@blog.io.tech",
+                    userEmail: "reply@blog.isaiahozadhe.tech",
                     isAdmin: true
                 })
             })
@@ -266,7 +266,7 @@ export function AdminCommentManager({ isOpen, onClose, postSlug }: AdminCommentM
                                             <div className="flex items-start justify-between">
                                                 <div className="flex items-center gap-2">
                                                     <div className="h-8 w-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center">
-                                                        {comment.user.email === "reply@blog.io.tech" ? (
+                                                        {comment.user.email === "reply@blog.isaiahozadhe.tech" ? (
                                                             <Crown className="h-4 w-4 text-amber-600" />
                                                         ) : (
                                                             <User className="h-4 w-4 text-primary" />
@@ -275,7 +275,7 @@ export function AdminCommentManager({ isOpen, onClose, postSlug }: AdminCommentM
                                                     <div>
                                                         <div className="flex items-center gap-2">
                                                             <span className="font-medium text-sm">{comment.user.name}</span>
-                                                            {comment.user.email === "reply@blog.io.tech" && (
+                                                            {comment.user.email === "reply@blog.isaiahozadhe.tech" && (
                                                                 <Badge variant="outline" className="text-xs border-amber-300 text-amber-600">
                                                                     <Crown className="h-3 w-3 mr-1" />
                                                                     Author
@@ -360,7 +360,7 @@ export function AdminCommentManager({ isOpen, onClose, postSlug }: AdminCommentM
                                                             <div>
                                                                 <Label className="text-xs">Email</Label>
                                                                 <Input
-                                                                    value="reply@blog.io.tech"
+                                                                    value="reply@blog.isaiahozadhe.tech"
                                                                     disabled
                                                                     className="h-8 text-sm bg-muted"
                                                                 />
@@ -423,7 +423,7 @@ export function AdminCommentManager({ isOpen, onClose, postSlug }: AdminCommentM
                                                                 <div className="flex items-start justify-between mb-2">
                                                                     <div className="flex items-center gap-2">
                                                                         <div className="h-6 w-6 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center">
-                                                                            {reply.user.email === "reply@blog.io.tech" ? (
+                                                                            {reply.user.email === "reply@blog.isaiahozadhe.tech" ? (
                                                                                 <Crown className="h-3 w-3 text-amber-600" />
                                                                             ) : (
                                                                                 <User className="h-3 w-3 text-primary" />
@@ -432,7 +432,7 @@ export function AdminCommentManager({ isOpen, onClose, postSlug }: AdminCommentM
                                                                         <div>
                                                                             <div className="flex items-center gap-2">
                                                                                 <span className="font-medium text-xs">{reply.user.name}</span>
-                                                                                {reply.user.email === "reply@blog.io.tech" && (
+                                                                                {reply.user.email === "reply@blog.isaiahozadhe.tech" && (
                                                                                     <Badge variant="outline" className="text-xs border-amber-300 text-amber-600">
                                                                                         <Crown className="h-3 w-3 mr-1" />
                                                                                         Author
