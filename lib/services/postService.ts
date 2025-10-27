@@ -6,7 +6,10 @@ export async function getPosts(page: number = 1, limit: number = 10, searchTerm?
     if (searchTerm) {
         url += `&searchTerm=${searchTerm}`;
     }
-    const response = await fetch(url);
+    const fetchUrl = typeof window === 'undefined'
+        ? `${process.env.NEXT_PUBLIC_SITE_URL || 'https://blog.isaiahozadhe.tech'}${url}`
+        : url;
+    const response = await fetch(fetchUrl);
     if (!response.ok) {
         throw new Error("Failed to fetch posts");
     }
@@ -21,7 +24,10 @@ export async function getPostsAndCount(page: number = 1, limit: number = 10, lay
     if (searchTerm) {
         url += `&searchTerm=${searchTerm}`;
     }
-    const response = await fetch(url);
+    const fetchUrl = typeof window === 'undefined'
+        ? `${process.env.NEXT_PUBLIC_SITE_URL || 'https://blog.isaiahozadhe.tech'}${url}`
+        : url;
+    const response = await fetch(fetchUrl);
     if (!response.ok) {
         throw new Error("Failed to fetch posts and count");
     }
@@ -29,7 +35,11 @@ export async function getPostsAndCount(page: number = 1, limit: number = 10, lay
 }
 
 export async function getPost(id: string): Promise<IPost> {
-    const response = await fetch(`/api/posts/${id}`);
+    const path = `/api/posts/${id}`;
+    const fetchUrl = typeof window === 'undefined'
+        ? `${process.env.NEXT_PUBLIC_SITE_URL || 'https://blog.isaiahozadhe.tech'}${path}`
+        : path;
+    const response = await fetch(fetchUrl);
     if (!response.ok) {
         throw new Error("Failed to fetch post");
     }
@@ -37,7 +47,11 @@ export async function getPost(id: string): Promise<IPost> {
 }
 
 export async function getPostBySlug(slug: string): Promise<IPost> {
-    const response = await fetch(`/api/posts/slug/${slug}`);
+    const path = `/api/posts/slug/${slug}`;
+    const fetchUrl = typeof window === 'undefined'
+        ? `${process.env.NEXT_PUBLIC_SITE_URL || 'https://blog.isaiahozadhe.tech'}${path}`
+        : path;
+    const response = await fetch(fetchUrl);
     if (!response.ok) {
         throw new Error("Failed to fetch post");
     }
@@ -45,7 +59,11 @@ export async function getPostBySlug(slug: string): Promise<IPost> {
 }
 
 export async function getPostsByLayer(layer: string): Promise<IPost[]> {
-    const response = await fetch(`/api/posts/layer/${layer}`);
+    const path = `/api/posts/layer/${layer}`;
+    const fetchUrl = typeof window === 'undefined'
+        ? `${process.env.NEXT_PUBLIC_SITE_URL || 'https://blog.isaiahozadhe.tech'}${path}`
+        : path;
+    const response = await fetch(fetchUrl);
     if (!response.ok) {
         throw new Error("Failed to fetch posts by layer");
     }
@@ -53,7 +71,11 @@ export async function getPostsByLayer(layer: string): Promise<IPost[]> {
 }
 
 export async function createPost(post: Partial<IPost>): Promise<IPost> {
-    const response = await fetch("/api/posts", {
+    const path = "/api/posts";
+    const fetchUrl = typeof window === 'undefined'
+        ? `${process.env.NEXT_PUBLIC_SITE_URL || 'https://blog.isaiahozadhe.tech'}${path}`
+        : path;
+    const response = await fetch(fetchUrl, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -67,7 +89,11 @@ export async function createPost(post: Partial<IPost>): Promise<IPost> {
 }
 
 export async function updatePost(id: string, post: Partial<IPost>): Promise<IPost> {
-    const response = await fetch(`/api/posts/${id}`, {
+    const path = `/api/posts/${id}`;
+    const fetchUrl = typeof window === 'undefined'
+        ? `${process.env.NEXT_PUBLIC_SITE_URL || 'https://blog.isaiahozadhe.tech'}${path}`
+        : path;
+    const response = await fetch(fetchUrl, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
@@ -81,7 +107,11 @@ export async function updatePost(id: string, post: Partial<IPost>): Promise<IPos
 }
 
 export async function deletePost(id: string): Promise<{ message: string }> {
-    const response = await fetch(`/api/posts/${id}`, {
+    const path = `/api/posts/${id}`;
+    const fetchUrl = typeof window === 'undefined'
+        ? `${process.env.NEXT_PUBLIC_SITE_URL || 'https://blog.isaiahozadhe.tech'}${path}`
+        : path;
+    const response = await fetch(fetchUrl, {
         method: "DELETE",
     });
     if (!response.ok) {
@@ -91,7 +121,11 @@ export async function deletePost(id: string): Promise<{ message: string }> {
 }
 
 export async function getLayerCounts(): Promise<{ [key: string]: number }> {
-    const response = await fetch(`/api/posts/layer/count`);
+    const path = `/api/posts/layer/count`;
+    const fetchUrl = typeof window === 'undefined'
+        ? `${process.env.NEXT_PUBLIC_SITE_URL || 'https://blog.isaiahozadhe.tech'}${path}`
+        : path;
+    const response = await fetch(fetchUrl);
     if (!response.ok) {
         throw new Error("Failed to fetch layer counts");
     }

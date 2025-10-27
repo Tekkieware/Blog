@@ -1,9 +1,9 @@
 import { MetadataRoute } from 'next'
-import { getPostsAndCount } from '@/lib/services/postService'
-import { IPost } from '@/models/post'
+import dbConnect from '@/lib/db'
+import Post from '@/models/post'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const baseUrl = 'https://blog.isaiahozadhe.tech'
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://blog.isaiahozadhe.tech'
 
     // Static pages
     const staticPages = [
@@ -35,8 +35,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // Dynamic post pages
     try {
-        const { posts } = await getPostsAndCount(1, 1000, 'all', '') // Get all posts
-        const postPages = posts.map((post: IPost) => ({
+        await dbConnect()
+        const posts = await Post.find({}).lean()
+
+        const postPages = posts.map((post: any) => ({
             url: `${baseUrl}/posts/${post.slug}`,
             lastModified: new Date(post.updatedAt || post.createdAt),
             changeFrequency: 'weekly' as const,
