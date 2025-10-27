@@ -7,12 +7,17 @@ import { FeaturedMarquee } from "@/components/featured-marquee"
 import { Button } from "@/components/ui-tailwind/button"
 import { useEffect, useState } from "react"
 import { NewsletterSubscribe } from "@/components/newsletter-subscribe"
+import { NoPostsEmptyState } from "@/components/empty-state"
+import { IPost } from "@/models/post";
+import { FeaturedMarqueeSkeleton } from "@/components/featured-marquee-skeleton";
 
 
 export default function HomeClient() {
     const [isPaused, setIsPaused] = useState(false)
     const [subscriberCount, setSubscriberCount] = useState<number>(0)
     const [subscriberLoading, setSubscriberLoading] = useState(true)
+    const [posts, setPosts] = useState<IPost[]>([]);
+    const [postsLoading, setPostsLoading] = useState(true);
 
     useEffect(() => {
         const fetchSubscriberCount = async () => {
@@ -30,7 +35,20 @@ export default function HomeClient() {
             }
         }
 
+        const fetchPosts = async () => {
+            try {
+                const response = await fetch('/api/posts?limit=3');
+                const data = await response.json();
+                setPosts(data.posts || []);
+            } catch (error) {
+                console.error('Failed to fetch posts:', error);
+            } finally {
+                setPostsLoading(false);
+            }
+        };
+
         fetchSubscriberCount()
+        fetchPosts();
     }, [])
 
     const formatCount = (count: number) => {
@@ -100,7 +118,13 @@ export default function HomeClient() {
 
                     {/* Featured Articles Marquee */}
                     <div className="w-full max-w-5xl">
-                        <FeaturedMarquee />
+                        {postsLoading ? (
+                            <FeaturedMarqueeSkeleton />
+                        ) : posts.length > 0 ? (
+                            <FeaturedMarquee />
+                        ) : (
+                            <NoPostsEmptyState />
+                        )}
                     </div>
                 </div>
             </section>

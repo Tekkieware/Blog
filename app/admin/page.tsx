@@ -34,6 +34,7 @@ import AdminPageSkeleton from "./loading"
 
 import AdminNav from '@/components/admin-nav';
 import { AdminCommentManager } from '@/components/admin-comment-manager';
+import { AdminNoPostsEmptyState } from '@/components/empty-state';
 
 export default function AdminPage() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -66,7 +67,7 @@ export default function AdminPage() {
       console.log("Fetching posts with searchTerm:", searchTerm);
       try {
         const { posts: fetchedPosts, total } = await getPostsAndCount(currentPage, 10, 'all', searchTerm);
-        setPosts(fetchedPosts);
+        setPosts(fetchedPosts || []);
         setTotalPages(Math.ceil(total / 10));
       } catch (error) {
         toast.error("Failed to fetch posts.");
@@ -229,11 +230,7 @@ export default function AdminPage() {
                         </tr>
                       ))
                     ) : (
-                      <tr>
-                        <td colSpan={4} className="py-6 text-center text-muted-foreground">
-                          No posts found
-                        </td>
-                      </tr>
+                      <AdminNoPostsEmptyState />
                     )}
                   </tbody>
                 </table>

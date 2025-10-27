@@ -26,6 +26,7 @@ import {
   PaginationNext,
 } from "@/components/ui/pagination";
 import { TableRowSkeleton } from '@/components/table-row-skeleton';
+import { NoNewsletterSubscribersEmptyState } from '@/components/empty-state';
 import { toast } from 'sonner';
 
 interface Subscriber {
@@ -99,6 +100,8 @@ export default function NewsletterManagementPage() {
                 Array.from({ length: 5 }).map((_, index) => (
                   <TableRowSkeleton key={index} />
                 ))
+              ) : subscribers.length === 0 ? (
+                <NoNewsletterSubscribersEmptyState />
               ) : (
                 subscribers.map((subscriber) => (
                   <TableRow key={subscriber._id}>

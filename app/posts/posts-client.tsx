@@ -17,6 +17,7 @@ import {
     PaginationPrevious,
 } from "@/components/ui/pagination"
 import { PaginationLoader } from "@/components/ui/pagination-loader"
+import { NoPostsEmptyState, SearchNotFoundEmptyState } from "@/components/empty-state";
 
 export default function PostsPageClient() {
     const searchParams = useSearchParams()
@@ -50,7 +51,7 @@ export default function PostsPageClient() {
         async function fetchPosts() {
             setLoading(true)
             const { posts: fetchedPosts, total } = await getPostsAndCount(page, POSTS_PER_PAGE, activeLayer, debouncedSearchTerm)
-            setPosts(fetchedPosts)
+            setPosts(fetchedPosts || [])
             setTotalPages(Math.ceil(total / POSTS_PER_PAGE))
             setLoading(false)
         }
@@ -90,10 +91,22 @@ export default function PostsPageClient() {
                     onSearchChange={handleSearchChange}
                 />
 
-                {viewMode === "grid" ? (
-                    <PostGrid loading={loading} activeLayer={activeLayer} posts={posts} />
+                {loading ? (
+                    viewMode === "grid" ? (
+                        <PostGrid loading={true} activeLayer={activeLayer} posts={[]} />
+                    ) : (
+                        <PostList loading={true} activeLayer={activeLayer} posts={[]} />
+                    )
+                ) : posts.length > 0 ? (
+                    viewMode === "grid" ? (
+                        <PostGrid loading={false} activeLayer={activeLayer} posts={posts} />
+                    ) : (
+                        <PostList loading={false} activeLayer={activeLayer} posts={posts} />
+                    )
+                ) : debouncedSearchTerm ? (
+                    <SearchNotFoundEmptyState query={debouncedSearchTerm} />
                 ) : (
-                    <PostList loading={loading} activeLayer={activeLayer} posts={posts} />
+                    <NoPostsEmptyState />
                 )}
 
                 {loading ? (

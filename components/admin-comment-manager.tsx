@@ -15,6 +15,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { MessageSquare, Trash2, Reply, Send, User, Crown, Loader2, Clock } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
 import { toast } from "sonner"
+import { NoCommentsEmptyState } from "@/components/empty-state";
 
 interface Comment {
     _id: string
@@ -253,10 +254,7 @@ export function AdminCommentManager({ isOpen, onClose, postSlug }: AdminCommentM
                             </div>
                         </ScrollArea>
                     ) : comments.length === 0 ? (
-                        <div className="text-center py-8">
-                            <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                            <p className="text-muted-foreground">No comments found for this post.</p>
-                        </div>
+                        <NoCommentsEmptyState />
                     ) : (
                         <ScrollArea className="h-[calc(100vh-200px)]">
                             <div className="space-y-4">

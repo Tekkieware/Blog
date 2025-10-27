@@ -17,12 +17,7 @@ interface EmptyStateProps {
     | "newsletter"
     title?: string
     description?: string
-    icon?: React.ReactNode
-    action?: {
-        label: string
-        href?: string
-        onClick?: () => void
-    }
+    icon?: React.ElementType
     className?: string
     size?: "sm" | "md" | "lg"
 }
@@ -33,35 +28,30 @@ const emptyStateConfigs = {
         description: "We couldn't find any posts. check back later to get the latest engineering insights!",
         icon: FileText,
         color: "indigo",
-        suggestions: ["Browse other layers for inspiration", "Check out the about page"],
     },
     comments: {
         title: "No Comments Yet",
         description: "Be the first to share your thoughts! Your comment could spark a great discussion.",
         icon: MessageSquare,
         color: "cyan",
-        suggestions: ["Share your insights", "Ask a thoughtful question"],
     },
     search: {
         title: "Nothing Found",
         description: "We couldn't find any posts matching your search. Try adjusting your filters or keywords.",
         icon: Search,
-        color: "orange",
-        suggestions: ["Try a different search term", "Browse all posts instead"],
+        color: "orange"
     },
     "admin-posts": {
         title: "No Posts Yet",
         description: "Create your first blog post to get started sharing your engineering insights.",
         icon: Code,
-        color: "indigo",
-        suggestions: ["Create a new post", "View documentation"],
+        color: "indigo"
     },
     newsletter: {
         title: "Build Your Audience",
         description: "No subscribers yet. Share your newsletter and grow your engineering community.",
         icon: Zap,
-        color: "cyan",
-        suggestions: ["Share the newsletter", "Write your first issue"],
+        color: "cyan"
     },
 }
 
@@ -133,7 +123,6 @@ export function EmptyState({
     title,
     description,
     icon,
-    action,
     className,
     size = "md",
 }: EmptyStateProps) {
@@ -188,71 +177,6 @@ export function EmptyState({
 
             {/* Description */}
             <p className={cn("text-muted-foreground max-w-md mb-8", sizes.description)}>{displayDescription}</p>
-
-            {/* Action Button */}
-            {action && (
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.2 }}
-                    className="mb-8"
-                >
-                    {action.href ? (
-                        <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
-                            <Link href={action.href}>{action.label}</Link>
-                        </Button>
-                    ) : (
-                        <Button onClick={action.onClick} className="bg-primary text-primary-foreground hover:bg-primary/90">
-                            {action.label}
-                        </Button>
-                    )}
-                </motion.div>
-            )}
-
-            {/* Suggestions */}
-            {config.suggestions && config.suggestions.length > 0 && (
-                <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="space-y-2 text-sm text-muted-foreground"
-                >
-                    <p className="font-medium text-foreground mb-3">Here's what you can do:</p>
-                    <ul className="space-y-2">
-                        {config.suggestions.map((suggestion, i) => (
-                            <motion.li
-                                key={i}
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: 0.4 + i * 0.1 }}
-                                className={cn("inline-block px-3 py-1.5 rounded-full border-2", colors.badge)}
-                            >
-                                {suggestion}
-                            </motion.li>
-                        ))}
-                    </ul>
-                </motion.div>
-            )}
-
-            {/* Additional Help */}
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.6 }}
-                className="mt-12 pt-8 border-t border-border text-xs text-muted-foreground"
-            >
-                <p>
-                    Need help?{" "}
-                    <Link href="/help" className="text-primary hover:underline font-medium">
-                        Check our documentation
-                    </Link>{" "}
-                    or{" "}
-                    <Link href="/contact" className="text-primary hover:underline font-medium">
-                        reach out to support
-                    </Link>
-                    .
-                </p>
-            </motion.div>
         </motion.div>
     )
 }
@@ -265,10 +189,6 @@ export function NoPostsEmptyState({ className }: { className?: string }) {
     return (
         <EmptyState
             variant="posts"
-            action={{
-                label: "Create First Post",
-                href: "/admin/posts/new",
-            }}
             className={className}
         />
     )
@@ -300,10 +220,6 @@ export function AdminNoPostsEmptyState({ className }: { className?: string }) {
     return (
         <EmptyState
             variant="admin-posts"
-            action={{
-                label: "Create New Post",
-                href: "/admin/posts/new",
-            }}
             className={className}
         />
     )
@@ -313,10 +229,6 @@ export function NoNewsletterSubscribersEmptyState({ className }: { className?: s
     return (
         <EmptyState
             variant="newsletter"
-            action={{
-                label: "Share Newsletter",
-                href: "/newsletter",
-            }}
             className={className}
         />
     )

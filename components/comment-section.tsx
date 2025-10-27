@@ -25,6 +25,7 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { ca } from "date-fns/locale"
+import { NoCommentsEmptyState } from "@/components/empty-state";
 
 interface Reply {
     _id: string
@@ -1206,13 +1207,7 @@ export function CommentSection({ postSlug, postAuthor, className }: CommentSecti
                     </AnimatePresence>
                 </div>
             ) : (
-                <Card className="p-12 text-center border-dashed border-2 border-border">
-                    <div className="inline-flex p-4 rounded-full bg-primary/10 border border-primary/20 mb-4">
-                        <MessageSquare className="h-8 w-8 text-primary" />
-                    </div>
-                    <h3 className="text-lg font-bold font-mono mb-2">No comments yet</h3>
-                    <p className="text-muted-foreground">Be the first to share your thoughts on this post!</p>
-                </Card>
+                <NoCommentsEmptyState />
             )}
         </div>
     )
