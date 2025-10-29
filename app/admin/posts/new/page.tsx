@@ -32,7 +32,8 @@ export default function NewPostPage() {
     author: "Isaiah Ozadhe",
     debug_notes: [] as string[],
     coverImage: "",
-    coverImageAlt: ""
+    coverImageAlt: "",
+    status: "draft",
   })
 
   const [tagInput, setTagInput] = useState("")
@@ -218,7 +219,7 @@ export default function NewPostPage() {
               className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
               <Save className="h-4 w-4 mr-2" />
-              {isSubmitting ? "Processing..." : "Publish Post"}
+              {isSubmitting ? "Processing..." : "Save Post"}
             </Button>
           </div>
         </div>
@@ -470,6 +471,24 @@ export default function NewPostPage() {
                             {layer.title}
                           </option>
                         ))}
+                      </select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label htmlFor="status" className="block text-sm font-medium">
+                        Status
+                      </label>
+                      <select
+                        id="status"
+                        name="status"
+                        required
+                        value={formData.status}
+                        onChange={handleChange}
+                        className="block w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
+                      >
+                        <option value="draft">Draft</option>
+                        <option value="published">Published</option>
+                        <option value="archived">Archived</option>
                       </select>
                     </div>
 

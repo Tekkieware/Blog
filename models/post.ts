@@ -13,6 +13,7 @@ export interface IPost extends Document {
     excerpt: string;
     slug: string;
     layer: string;
+    status: 'published' | 'draft' | 'archived';
     createdAt: string;
     updatedAt: string
 }
@@ -30,6 +31,7 @@ const PostSchema = new Schema<IPost>(
         slug: { type: String, required: true, unique: true },
         layer: { type: String, required: true },
         debug_notes: { type: [String], default: [] },
+        status: { type: String, enum: ['published', 'draft', 'archived'], default: 'draft' },
 
     },
     { timestamps: true }
