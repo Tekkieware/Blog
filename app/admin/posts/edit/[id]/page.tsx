@@ -450,6 +450,24 @@ export default function EditPostPage({ params: promiseParams }: { params: Promis
                     </div>
 
                     <div className="space-y-2">
+                      <label htmlFor="status" className="block text-sm font-medium">
+                        Status
+                      </label>
+                      <select
+                        id="status"
+                        name="status"
+                        required
+                        value={formData.status || 'draft'} // Default to 'draft' if not set
+                        onChange={handleChange}
+                        className="block w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
+                      >
+                        <option value="draft">Draft</option>
+                        <option value="published">Published</option>
+                        <option value="archived">Archived</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-2">
                       <label className="block text-sm font-medium">Tags</label>
                       <div className="space-y-3">
                         <div className="flex gap-2">
