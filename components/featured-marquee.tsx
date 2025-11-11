@@ -33,25 +33,32 @@ const getLayerColor = (layer: string) => {
   }
 }
 
-export function FeaturedMarquee() {
+interface FeaturedMarqueeProps {
+  posts?: IPost[]
+}
+
+export function FeaturedMarquee({ posts: initialPosts }: FeaturedMarqueeProps) {
   const [isPaused, setIsPaused] = useState(false)
   const marqueeRef = useRef<HTMLDivElement>(null)
-  const [posts, setPosts] = useState<IPost[]>([])
-  const [loading, setLoading] = useState(true)
+  const [posts, setPosts] = useState<IPost[]>(initialPosts || [])
+  const [loading, setLoading] = useState(!initialPosts)
 
   useEffect(() => {
-    async function fetchPosts() {
-      setLoading(true)
-      const fetchedPosts = await getPosts()
-      setPosts(fetchedPosts)
-      setLoading(false)
+    // Only fetch posts if they weren't provided as props
+    if (!initialPosts) {
+      async function fetchPosts() {
+        setLoading(true)
+        const fetchedPosts = await getPosts()
+        setPosts(fetchedPosts)
+        setLoading(false)
+      }
+      fetchPosts()
     }
+  }, [initialPosts])
 
-    fetchPosts()
-  }, [])
-
-  // Duplicate the posts for continuous scrolling
-  const allPosts = posts.length > 0 ? [...posts, ...posts] : []
+  // Only show scrolling animation if we have more than 3 posts
+  const shouldScroll = posts.length > 3
+  const allPosts = posts // No duplication at all
 
   // Add this function after the allPosts declaration
   const togglePause = () => {
@@ -80,12 +87,12 @@ export function FeaturedMarquee() {
           className={cn("absolute top-0 right-0 h-[200px] w-1 bg-primary z-10", isPaused ? "" : "animate-cursor-blink")}
         ></div>
 
-        <div ref={marqueeRef} className={cn("flex gap-4 marquee-animation", isPaused && "marquee-paused")}>
+        <div ref={marqueeRef} className={cn("flex gap-4 justify-center", shouldScroll && "marquee-animation", isPaused && "marquee-paused")}>
           {allPosts.map((post, index) => (
             <Link href={`/posts/${post.slug}`} key={`${post._id}-${index}`} className="shrink-0">
               <Card
                 className={cn(
-                  "w-[320px] h-[200px] overflow-hidden transition-all duration-200 group border-2",
+                  "w-[320px] h-[200px] overflow-hidden transition-all duration-200 group border-2 relative",
                   `border-${getLayerColor(post.layer)}-400/30 hover:border-${getLayerColor(post.layer)}-400/50`,
                   "hover:shadow-lg dark:hover:shadow-[0_0_15px_rgba(0,240,255,0.15)]",
                 )}
@@ -142,24 +149,26 @@ export function FeaturedMarquee() {
             <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
           </Link>
         </Button>
-        <Button
-          size="lg"
-          variant="outline"
-          className="backdrop-blur-sm border-primary/20 hover:bg-primary/10 flex items-center"
-          onClick={togglePause}
-        >
-          {isPaused ? (
-            <>
-              <Play className="mr-2 h-4 w-4" />
-              Resume the Flow
-            </>
-          ) : (
-            <>
-              <Pause className="mr-2 h-4 w-4" />
-              Pause to Catch Something Cool
-            </>
-          )}
-        </Button>
+        {shouldScroll && (
+          <Button
+            size="lg"
+            variant="outline"
+            className="backdrop-blur-sm border-primary/20 hover:bg-primary/10 flex items-center"
+            onClick={togglePause}
+          >
+            {isPaused ? (
+              <>
+                <Play className="mr-2 h-4 w-4" />
+                Resume the Flow
+              </>
+            ) : (
+              <>
+                <Pause className="mr-2 h-4 w-4" />
+                Pause to Catch Something Cool
+              </>
+            )}
+          </Button>
+        )}
       </div>
     </div>
   )

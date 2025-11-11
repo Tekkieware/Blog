@@ -37,9 +37,10 @@ export default function HomeClient() {
 
         const fetchPosts = async () => {
             try {
-                const response = await fetch('/api/posts?limit=3');
+                const response = await fetch('/api/posts?limit=10');
                 const data = await response.json();
-                setPosts(data.posts || []);
+                // API returns posts array directly when includeCount is not specified
+                setPosts(Array.isArray(data) ? data : (data.posts || []));
             } catch (error) {
                 console.error('Failed to fetch posts:', error);
             } finally {
@@ -121,7 +122,7 @@ export default function HomeClient() {
                         {postsLoading ? (
                             <FeaturedMarqueeSkeleton />
                         ) : posts.length > 0 ? (
-                            <FeaturedMarquee />
+                            <FeaturedMarquee posts={posts} />
                         ) : (
                             <NoPostsEmptyState />
                         )}
