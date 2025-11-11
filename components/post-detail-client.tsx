@@ -148,10 +148,16 @@ export default function PostDetailClient({ slug }: PostDetailClientProps) {
                             {/* Tags */}
                             <div className="flex flex-wrap gap-2">
                                 {post.tags.map((tag: string) => (
-                                    <Badge key={tag} variant="secondary" className="text-xs font-mono">
-                                        <Tag className="h-3 w-3 mr-1" />
-                                        {tag}
-                                    </Badge>
+                                    <Link
+                                        key={tag}
+                                        href={`/posts/tag/${encodeURIComponent(tag)}`}
+                                        className="hover:scale-105 transition-transform"
+                                    >
+                                        <Badge variant="secondary" className="text-xs font-mono hover:bg-secondary/80 cursor-pointer">
+                                            <Tag className="h-3 w-3 mr-1" />
+                                            {tag}
+                                        </Badge>
+                                    </Link>
                                 ))}
                             </div>
                         </header>

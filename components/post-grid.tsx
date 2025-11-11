@@ -34,12 +34,12 @@ const getLayerColor = (layer: string) => {
 }
 
 interface PostGridProps {
-  activeLayer: string
+  activeLayer?: string
   posts: IPost[]
-  loading: boolean
+  loading?: boolean
 }
 
-export function PostGrid({ activeLayer, posts, loading }: PostGridProps) {
+export function PostGrid({ activeLayer = "all", posts, loading = false }: PostGridProps) {
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -108,9 +108,16 @@ export function PostGrid({ activeLayer, posts, loading }: PostGridProps) {
                   <p className="text-muted-foreground">{post.excerpt}</p>
                   <div className="flex flex-wrap gap-2 mt-4">
                     {post.tags.map((tag) => (
-                      <Badge key={tag} variant="secondary" className="text-xs">
-                        {tag}
-                      </Badge>
+                      <Link
+                        key={tag}
+                        href={`/posts/tag/${encodeURIComponent(tag)}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="hover:scale-105 transition-transform"
+                      >
+                        <Badge variant="secondary" className="text-xs hover:bg-secondary/80 cursor-pointer">
+                          {tag}
+                        </Badge>
+                      </Link>
                     ))}
                   </div>
                 </CardContent>
