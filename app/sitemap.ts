@@ -54,7 +54,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             priority: 0.6,
         }))
 
-        return [...staticPages, ...postPages, ...layerPages]
+        // Tag pages - get unique tags from all posts
+        const allTags = new Set<string>()
+        posts.forEach((post: any) => {
+            if (post.tags && Array.isArray(post.tags)) {
+                post.tags.forEach((tag: string) => allTags.add(tag))
+            }
+        })
+
+        const tagPages = Array.from(allTags).map((tag) => ({
+            url: `${baseUrl}/posts/tag/${encodeURIComponent(tag)}`,
+            lastModified: new Date(),
+            changeFrequency: 'weekly' as const,
+            priority: 0.5,
+        }))
+
+        return [...staticPages, ...postPages, ...layerPages, ...tagPages]
     } catch (error) {
         console.error('Error generating sitemap:', error)
         return staticPages
