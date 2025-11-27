@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { deleteCookie } from "cookies-next"
 import Link from "next/link"
-import { getPostsAndCount, deletePost, getLayerCounts } from "@/lib/services/postService";
+import { getPostsAndCount, deletePost, getLayerCounts, getAdminPostsAndCount } from "@/lib/services/postService";
 import { IPost } from "@/models/post";
 import { toast } from "sonner";
 import AdminPageSkeleton from "./loading"
@@ -66,7 +66,7 @@ export default function AdminPage() {
     const fetchPosts = async () => {
       console.log("Fetching posts with searchTerm:", searchTerm);
       try {
-        const { posts: fetchedPosts, total } = await getPostsAndCount(currentPage, 10, 'all', searchTerm);
+        const { posts: fetchedPosts, total } = await getAdminPostsAndCount(currentPage, 10, 'all', searchTerm);
         setPosts(fetchedPosts || []);
         setTotalPages(Math.ceil(total / 10));
       } catch (error) {

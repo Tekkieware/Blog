@@ -34,6 +34,24 @@ export async function getPostsAndCount(page: number = 1, limit: number = 10, lay
     return response.json();
 }
 
+export async function getAdminPostsAndCount(page: number = 1, limit: number = 10, layer?: string, searchTerm?: string): Promise<{ posts: IPost[], total: number }> {
+    let url = `/api/posts/admin?page=${page}&limit=${limit}&includeCount=true`;
+    if (layer && layer !== 'all') {
+        url += `&layer=${layer}`;
+    }
+    if (searchTerm) {
+        url += `&searchTerm=${searchTerm}`;
+    }
+    const fetchUrl = typeof window === 'undefined'
+        ? `${process.env.NEXT_PUBLIC_SITE_URL || 'https://blog.isaiahozadhe.tech'}${url}`
+        : url;
+    const response = await fetch(fetchUrl);
+    if (!response.ok) {
+        throw new Error("Failed to fetch posts and count");
+    }
+    return response.json();
+}
+
 export async function getPost(id: string): Promise<IPost> {
     const path = `/api/posts/${id}`;
     const fetchUrl = typeof window === 'undefined'
