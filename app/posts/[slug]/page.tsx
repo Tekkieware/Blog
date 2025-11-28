@@ -1,28 +1,52 @@
-import { Metadata } from 'next'
-import { generateSEOMetadata } from '@/lib/seo'
-import { StructuredData } from '@/components/structured-data'
-import PostDetailClient from '@/components/post-detail-client'
 
-// For now, let's use basic metadata and let the client component handle the data fetching
-export const metadata: Metadata = generateSEOMetadata({
-  title: 'Blog Post',
-  description: 'Read the latest insights on software engineering and web development.',
-  url: 'https://blog.isaiahozadhe.tech/posts',
-})
+import { Metadata } from 'next';
+import { generateSEOMetadata } from '@/lib/seo';
+import { StructuredData } from '@/components/structured-data';
+import PostDetailClient from '@/components/post-detail-client';
+import { getPostBySlug } from '@/lib/services/postService';
+
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const post = await getPostBySlug(params.slug);
+  if (!post) {
+    return generateSEOMetadata({
+      title: 'Blog Post',
+      description: 'Read the latest insights on software engineering and web development.',
+      url: `https://blog.isaiahozadhe.tech/posts/${params.slug}`,
+    });
+  }
+  return generateSEOMetadata({
+    title: post.title,
+    description: post.excerpt,
+    image: post.coverImage,
+    url: `/posts/${post.slug}`,
+    type: 'article',
+    publishedDate: post.createdAt,
+    modifiedDate: post.updatedAt,
+    author: post.author,
+    tags: post.tags,
+    section: post.layer,
+  });
+}
 
 export default async function PostDetail({ params }: { params: { slug: string } }) {
-  const resolvedParams = await params;
+  const post = await getPostBySlug(params.slug);
   return (
     <>
       <StructuredData
-        type="website"
+        type="article"
         data={{
-          name: 'Isaiah Ozadhe Blog Post',
-          url: `https://blog.isaiahozadhe.tech/posts/${resolvedParams.slug}`,
-          description: 'Software engineering insights and tutorials.',
+          headline: post?.title,
+          description: post?.excerpt,
+          author: post?.author,
+          datePublished: post?.createdAt,
+          dateModified: post?.updatedAt,
+          image: post?.coverImage,
+          url: `https://blog.isaiahozadhe.tech/posts/${post?.slug}`,
+          keywords: post?.tags,
+          articleSection: post?.layer,
         }}
       />
-      <PostDetailClient slug={resolvedParams.slug} />
+      <PostDetailClient slug={params.slug} />
     </>
   );
 }
